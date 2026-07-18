@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Keyboard Training · Scuola Sacra Famiglia</title>
+<title>Keyboard Training Challenge · Scuola Sacra Famiglia</title>
 <link rel="icon" href="logo.svg">
 <link rel="apple-touch-icon" href="logo.png">
 <style>
@@ -57,6 +57,19 @@ select{appearance:none;-webkit-appearance:none;
   font-size:1.08rem;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:transform .1s,background .15s}
 .btn-start:hover{background:var(--blueD)} .btn-start:active{transform:scale(.985)}
 
+/* ---------- AVATAR ---------- */
+.av{width:100%;height:100%;display:block}
+.av-pick{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:2px}
+.av-btn{aspect-ratio:1;padding:3px;border-radius:50%;border:2px solid transparent;background:#fff;
+  cursor:pointer;transition:transform .12s,border-color .12s,box-shadow .12s}
+.av-btn:hover{transform:scale(1.08)}
+.av-btn.sel{border-color:var(--blue);box-shadow:0 0 0 3px var(--blueL)}
+.profile-card{display:flex;align-items:center;gap:11px}
+.pav{width:38px;height:38px;flex:0 0 auto}
+.pnick{font-weight:700;font-size:.98rem}
+.pcls{font-size:.76rem;color:var(--muted);font-weight:600}
+.board-row .bav{width:24px;height:24px;flex:0 0 auto}
+
 /* ---------- APP ---------- */
 #appContainer{display:none;height:100vh;width:100vw;grid-template-columns:1fr 380px}
 .game-zone{position:relative;display:flex;flex-direction:column;padding:16px 34px 20px;
@@ -90,20 +103,14 @@ select{appearance:none;-webkit-appearance:none;
   border-radius:2px;animation:blink 1.05s steps(1) infinite;margin:0 1px}
 @keyframes blink{50%{opacity:0}}
 
-/* Mani */
-.hands{display:flex;justify-content:center;gap:74px;align-items:flex-end;height:96px}
-.hand{display:flex;align-items:flex-end;gap:7px;height:100%}
-.hand.right{flex-direction:row}
-.finger{width:20px;border-radius:11px 11px 5px 5px;border:1px solid rgba(0,0,0,.10);
-  background:var(--zTh);transition:transform .09s,box-shadow .09s,filter .09s}
-.finger.active{transform:translateY(-14px);box-shadow:0 8px 16px rgba(0,113,227,.28),0 0 0 3px var(--blue);
-  filter:saturate(1.15);z-index:2}
-.f-thumb{height:38px} .f-index{height:74px} .f-mid{height:90px} .f-ring{height:80px} .f-pinky{height:60px}
-.thumb-l{transform-origin:bottom right;transform:rotate(28deg)}
-.thumb-r{transform-origin:bottom left;transform:rotate(-28deg)}
-.thumb-l.active,.thumb-r.active{transform:translateY(-14px)}
-#L5{background:var(--zL5)} #L4{background:var(--zL4)} #L3{background:var(--zL3)} #L2{background:var(--zL2)}
-#R2{background:var(--zR2)} #R3{background:var(--zR3)} #R4{background:var(--zR4)} #R5{background:var(--zR5)}
+/* Mani (SVG dorso, dita evidenziabili) */
+.hands{display:flex;justify-content:center;gap:52px;align-items:flex-end;height:108px}
+.hand-svg{height:108px;width:auto;filter:drop-shadow(0 6px 12px rgba(0,0,0,.10))}
+.hand-svg .hskin{fill:#EFE6DC;stroke:#D8CCBF;stroke-width:2;stroke-linejoin:round}
+.hand-svg .hknuckle{stroke:#DCCFC1;stroke-width:1.6;fill:none;stroke-linecap:round}
+.hand-svg .fg{stroke:transparent;fill:none;stroke-linecap:round;transition:stroke .1s}
+.hand-svg .fg.on{stroke:var(--c);animation:fpulse 1.1s ease-in-out infinite}
+@keyframes fpulse{0%,100%{opacity:.95}50%{opacity:.5}}
 
 /* ---------- TASTIERA (Magic Keyboard ISO) ---------- */
 .kbd-wrap{background:linear-gradient(#f6f7f9,#dcdee2);border:1px solid #cbcdd3;border-radius:16px;
@@ -154,22 +161,42 @@ select{appearance:none;-webkit-appearance:none;
 /* ---------- SIDEBAR ---------- */
 .sidebar{background:var(--card);display:flex;flex-direction:column;gap:14px;padding:20px;overflow-y:auto}
 .card-lite{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
-.score-card{text-align:center;padding:18px 16px}
+.score-card{display:flex;align-items:center;justify-content:space-around;padding:14px 16px;text-align:center}
 .score-num{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;color:var(--blue);line-height:1}
-.score-lbl{font-size:.74rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.score-lbl{font-size:.72rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.score-done{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;color:var(--ink);line-height:1}
 .sec-lbl{font-size:.72rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
-.rewards{display:flex;flex-wrap:wrap;gap:6px;min-height:30px}
-.reward{width:26px;height:26px;border-radius:8px;background:var(--greenL);color:var(--green);
-  display:flex;align-items:center;justify-content:center;animation:popIn .32s}
-.reward svg{width:15px;height:15px}
-.loc{display:flex;align-items:center;gap:8px;font-size:.92rem;font-weight:600;color:var(--ink)}
-.loc svg{width:17px;height:17px;color:var(--blue);flex:0 0 auto}
-#mapContainer{flex:1;min-height:200px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
-#mapFrame{width:100%;height:100%;border:none;display:block}
+/* Grado */
+.rank-line{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rank-badge{display:inline-flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:700;color:var(--ink)}
+.rank-badge svg{width:20px;height:20px;color:var(--amber2)}
+.rank-next{font-size:.78rem;font-weight:600;color:var(--muted)}
+.rank-bar{height:8px;border-radius:5px;background:#e5e5ea;margin-top:10px;overflow:hidden}
+.rank-bar i{display:block;height:100%;border-radius:5px;background:linear-gradient(90deg,var(--amber),var(--amber2));
+  width:0;transition:width .5s ease}
+/* Classifica */
+.board-card{flex:1;min-height:160px;display:flex;flex-direction:column}
+.board-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px}
+.board-row{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);
+  border-radius:10px;padding:7px 10px;font-size:.88rem}
+.board-row .pos{width:20px;text-align:center;font-weight:700;color:var(--muted);flex:0 0 auto}
+.board-row .bnick{flex:1;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.board-row .bpts{font-weight:700;color:var(--blue);flex:0 0 auto}
+.board-row .bdone{font-size:.74rem;color:var(--muted);flex:0 0 auto}
+.board-row.me{border-color:var(--blue);background:var(--blueL)}
+.board-row.top .pos{color:var(--amber2)}
+.board-empty{font-size:.85rem;color:var(--muted);line-height:1.5;padding:6px 2px}
+.board-live{display:inline-flex;align-items:center;gap:6px}
+.board-live i{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;animation:fpulse 1.6s infinite}
+/* Toast promozione */
+.toast{position:absolute;top:84px;left:50%;transform:translateX(-50%) translateY(-8px);z-index:50;
+  background:var(--ink);color:#fff;border-radius:16px;padding:13px 22px;display:flex;align-items:center;gap:10px;
+  font-weight:600;box-shadow:var(--shadow2);opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast svg{width:20px;height:20px;color:var(--amber2)}
 .btn-ninja{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:13px;
   font-size:.96rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.12s}
 .btn-ninja:hover{background:#000} .btn-ninja svg{width:18px;height:18px}
-@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
 
 /* ---------- NINJA ---------- */
 #ninjaApp{display:none;height:100vh;width:100vw;flex-direction:column;align-items:center;justify-content:center;
@@ -207,11 +234,14 @@ select{appearance:none;-webkit-appearance:none;
 <div id="loginScreen">
   <div class="login-modal">
     <div class="login-brand" id="loginBrand"></div>
-    <div class="login-title">Keyboard Training</div>
+    <div class="login-title">Keyboard Training Challenge</div>
     <div class="login-sub">Laboratorio di Informatica · Esercizi di dattilografia del prof. Andrea Cerioli</div>
 
-    <label class="field-lbl" for="nameInput">Il tuo nome</label>
-    <input type="text" id="nameInput" placeholder="Scrivi il tuo nome…" autocomplete="off">
+    <label class="field-lbl" for="nameInput">Il tuo nickname</label>
+    <input type="text" id="nameInput" placeholder="Inventa un nickname…" autocomplete="off" maxlength="14">
+
+    <label class="field-lbl">Il tuo avatar</label>
+    <div class="av-pick" id="avPick"></div>
 
     <label class="field-lbl" for="classSelect">La tua classe</label>
     <select id="classSelect">
@@ -255,12 +285,14 @@ select{appearance:none;-webkit-appearance:none;
 <!-- ==================== APP ==================== -->
 <div id="appContainer">
   <div class="game-zone">
+    <div class="toast" id="toast"></div>
     <div class="topbar">
       <div class="audio-wrap">
         <button class="chip muted" id="musicBtn" onclick="toggleMusic()"><span id="musicIcon"></span><span id="musicLbl">Musica</span></button>
         <select id="trackSelect" class="track-select" onchange="cambiaTraccia(this)">
           <option value="0">Command</option><option value="1">La Collina</option><option value="2">Bag Raiders</option><option value="3">Pink · Try</option>
         </select>
+        <button class="chip" id="sndBtn" onclick="toggleSnd()"><span id="sndIcon"></span><span id="sndLbl">Suoni attivi</span></button>
       </div>
       <div id="appBrand"></div>
       <button class="chip" onclick="esciLogin()"><span id="exitIcon"></span>Esci</button>
@@ -274,18 +306,7 @@ select{appearance:none;-webkit-appearance:none;
     <div class="stage">
       <div class="phrase-container"><div id="phraseText" class="text-wrapper"></div></div>
 
-      <div class="hands">
-        <div class="hand left">
-          <div class="finger f-pinky" id="L5"></div><div class="finger f-ring" id="L4"></div>
-          <div class="finger f-mid" id="L3"></div><div class="finger f-index" id="L2"></div>
-          <div class="finger f-thumb thumb-l" id="L1"></div>
-        </div>
-        <div class="hand right">
-          <div class="finger f-thumb thumb-r" id="R1"></div><div class="finger f-index" id="R2"></div>
-          <div class="finger f-mid" id="R3"></div><div class="finger f-ring" id="R4"></div>
-          <div class="finger f-pinky" id="R5"></div>
-        </div>
-      </div>
+      <div class="hands" id="handsWrap"></div>
 
       <div class="kbd-wrap" id="kbdChef"></div>
       <div class="legend" id="legend"></div>
@@ -293,16 +314,26 @@ select{appearance:none;-webkit-appearance:none;
   </div>
 
   <aside class="sidebar">
+    <div class="card-lite profile-card">
+      <span class="pav" id="profAv"></span>
+      <div><div class="pnick" id="profNick"></div><div class="pcls" id="profCls"></div></div>
+    </div>
     <div class="card-lite score-card">
-      <div class="score-num" id="scoreNum">0</div>
-      <div class="score-lbl">Punti</div>
+      <div><div class="score-num" id="scoreNum">0</div><div class="score-lbl">Punti</div></div>
+      <div><div class="score-done" id="doneNum">0</div><div class="score-lbl">Frasi</div></div>
     </div>
     <div class="card-lite">
-      <div class="sec-lbl">Traguardi</div>
-      <div class="rewards" id="rewards"></div>
+      <div class="sec-lbl">Il tuo grado</div>
+      <div class="rank-line">
+        <span class="rank-badge" id="rankBadge"></span>
+        <span class="rank-next" id="rankNext"></span>
+      </div>
+      <div class="rank-bar"><i id="rankBar"></i></div>
     </div>
-    <div class="card-lite"><div class="loc" id="loc"></div></div>
-    <div id="mapContainer"><iframe id="mapFrame" title="Mappa del luogo"></iframe></div>
+    <div class="card-lite board-card">
+      <div class="sec-lbl board-live"><i></i>Classifica in laboratorio</div>
+      <div class="board-list" id="boardList"></div>
+    </div>
     <button class="btn-ninja" onclick="goToNinja()"><span id="ninjaIcon"></span>Allenamento Ninja</button>
   </aside>
 </div>
@@ -322,6 +353,19 @@ select{appearance:none;-webkit-appearance:none;
 <script>
 "use strict";
 
+/* ============ CONFIG CLASSIFICA (Google Sheets + Apps Script) ============ */
+// Incolla qui l'URL /exec del Web App (istruzioni in KEYBOARD-TRAINING-classifica.gs).
+// Con URL vuoto l'app funziona ugualmente, senza classifica.
+const LB_URL = "https://script.google.com/macros/s/AKfycbzF5vkJWB9bRZhuPePh9hJZrYYY5cfcksRzMsiWNZAtm9jS1NVq2ne7Nzx9364yhPW-ug/exec";
+const LB_PUSH_MS = 10000;   // heartbeat: invio punteggio ogni 10 s
+const LB_POLL_MS = 12000;   // lettura classifica ogni 12 s
+
+/* PRNG seedato: stesso giorno + stessa passione = stesso pool di frasi per tutti */
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function dayStr(){const d=new Date(),p=function(n){return (n<10?'0':'')+n;};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+const SESSION_ID = 'S'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+
 /* ============ ICONE SVG (zero emoji) ============ */
 const ICONS = {
   keyboard:'<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/>',
@@ -330,6 +374,7 @@ const ICONS = {
   exit:'<path d="M10 4H5v16h5"/><path d="M15 8l4 4-4 4M19 12H9"/>',
   pin:'<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/>',
   trophy:'<path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M9 15h6M10 19h4M12 15v4"/>',
+  medal:'<circle cx="12" cy="9.5" r="5.5"/><path d="M12 7.4l.8 1.6 1.8.3-1.3 1.3.3 1.8-1.6-.8-1.6.8.3-1.8-1.3-1.3 1.8-.3z"/><path d="M8.8 14.2L7.2 21l4.8-2.5L16.8 21l-1.6-6.8"/>',
   check:'<path d="M4 12l5 5L20 6"/>',
   back:'<path d="M15 6l-6 6 6 6"/>',
   // topic
@@ -373,6 +418,136 @@ function brandHTML(){
     '<path d="M30 8.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" fill="#D4A017"/></svg>'+
     '<div class="brand-txt"><span class="brand-name">Scuola Sacra Famiglia</span>'+
     '<span class="brand-role">Animatore Digitale · Andrea Cerioli</span></div></div>';
+}
+
+/* ============ AVATAR (DiceBear "Thumbs", licenza CC0 — incorporati inline) ============
+   Generati una tantum da https://api.dicebear.com/9.x/thumbs/svg — nessuna dipendenza a runtime. */
+const AVATARS = ["<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#b6e3f4\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(-5, -4) rotate(8 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#1c799f\"/><g transform=\"translate(29 33)\"><g transform=\"translate(13, -7) rotate(8 21 21)\"><g transform=\"translate(0 4)\"><path d=\"M-2.75 8.12C-1.34 11.86 9 16 9 16s5.17-9.58 3.76-13.32c0 0-1.41-3.74-5.3-2.38-3.87 1.36-2.7 4.48-2.7 4.48S3.6 1.66-.27 3.02c-3.88 1.36-2.47 5.1-2.47 5.1ZM29.24 2.68C27.84 6.42 33 16 33 16s10.34-4.14 11.75-7.88c0 0 1.41-3.74-2.47-5.1-3.87-1.36-5.05 1.76-5.05 1.76s1.18-3.12-2.7-4.48c-3.88-1.36-5.29 2.38-5.29 2.38Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 24)\"><path d=\"M15.5 10c-5.07 0-9.3-5.23-8.37-5.88.93-.65 3.45 2.15 8.37 2.15 4.92 0 7.44-2.88 8.37-2.15.93.73-3.3 5.88-8.37 5.88Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#c0f0c8\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(1, -3) rotate(-14 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#69d2e7\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-15, 5) rotate(10 21 21)\"><g transform=\"translate(0 3)\"><path d=\"M13 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4ZM35 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 25)\"><path d=\"M15 14C1.9 14-.72 1.29.15.23 1.03-.83 6.27 2.11 15 2.11S28.97-.83 29.85.23C30.72 1.3 28.1 14 15 14Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#ffd6a5\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(4, 1) rotate(10 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#1c799f\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-13, 9) rotate(-7 21 21)\"><g transform=\"translate(0 5)\"><path d=\"M13 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4ZM35 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 23)\"><path d=\"M15 10C6.79 10 3.02 3.88 4.22 3.12 5.42 2.35 6.1 6.6 15 6.49c8.9-.12 9.58-4.23 10.78-3.37C26.98 3.98 23.21 10 15 10Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#e4c1f9\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(-4, 2) rotate(12 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#1c799f\"/><g transform=\"translate(29 33)\"><g transform=\"translate(5, 2) rotate(-15 21 21)\"><g transform=\"translate(0 5)\"><path d=\"M16 8c0 1.66-1.12 3-2.5 3S11 9.66 11 8s1.12-3 2.5-3S16 6.34 16 8ZM31 8c0 1.66-1.12 3-2.5 3S26 9.66 26 8s1.12-3 2.5-3S31 6.34 31 8Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 23)\"><path d=\"M15.2 3.84c0-.67-4.2-2-4.2-2.67 0-.66 7 .67 7 2.67S13.8 6.5 13.8 6.5s4.2.67 4.2 2.66c0 2-7 3.33-7 2.67 0-.67 4.2-2 4.2-2.67 0-.66-3.5-1.33-3.5-2.66s3.5-2 3.5-2.66Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#fdffb6\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(-1, -3) rotate(10 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#69d2e7\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-5, 1) rotate(-4 21 21)\"><g transform=\"translate(0 2)\"><path d=\"M6.5 10C2.62 10-.61 5.77.1 5.15c.71-.62 2.63 1.3 6.4 1.3 3.77 0 5.69-2 6.4-1.3S10.38 10 6.5 10ZM35.5 10c-3.88 0-7.11-4.23-6.4-4.85.71-.62 2.63 1.3 6.4 1.3 3.77 0 5.69-2 6.4-1.3S39.38 10 35.5 10Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 26)\"><path d=\"M15 11C4.52 11 2.42 2.82 3.12 2.14 3.82 1.46 8.02 3.5 15 3.5c6.99 0 11.18-2.04 11.88-1.36.7.68-1.4 8.86-11.88 8.86Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#9bf6ff\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(3, -3) rotate(10 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#f1f4dc\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-1, 9) rotate(-4 21 21)\"><g transform=\"translate(0 4)\"><path d=\"M12 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4ZM30.5 5C27.29 5 26 6.36 26 7.04c0 3.4 1.29 1.35 4.5 1.35S35 10.43 35 7.04C35 6.36 33.71 5 30.5 5Z\" fill=\"#000000\"/></g><g transform=\"translate(6 24)\"><path d=\"M15.5 10c-5.07 0-9.3-5.23-8.37-5.88.93-.65 3.45 2.15 8.37 2.15 4.92 0 7.44-2.88 8.37-2.15.93.73-3.3 5.88-8.37 5.88Z\" fill=\"#000000\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#ffc6ff\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(5, -1) rotate(-14 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#69d2e7\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-1, 15) rotate(-15 21 21)\"><g transform=\"translate(0 3)\"><path d=\"M8.86 7.5c0-1.42-4.14-2.85-4.82-4.98C3.34.4 13 5.37 13 7.5c0 2.13-9.65 7.11-8.96 4.98.68-2.13 4.82-3.56 4.82-4.98ZM33.14 7.5c0-1.42 4.14-2.85 4.82-4.98C38.66.4 29 5.37 29 7.5c0 2.13 9.65 7.11 8.96 4.98-.68-2.13-4.82-3.56-4.82-4.98Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 25)\"><path d=\"M15 10C6.79 10 3.02 3.88 4.22 3.12 5.42 2.35 6.1 6.6 15 6.49c8.9-.12 9.58-4.23 10.78-3.37C26.98 3.98 23.21 10 15 10Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#caffbf\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(4, 3) rotate(-10 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#f88c49\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-2, 7) rotate(17 21 21)\"><g transform=\"translate(0 5)\"><path d=\"M-.75 8.12C.66 11.86 11 16 11 16s5.17-9.58 3.76-13.32c0 0-1.41-3.74-5.3-2.38-3.87 1.36-2.7 4.48-2.7 4.48S5.6 1.66 1.73 3.02c-3.88 1.36-2.47 5.1-2.47 5.1ZM27.24 2.68C25.84 6.42 31 16 31 16s10.34-4.14 11.75-7.88c0 0 1.41-3.74-2.47-5.1-3.87-1.36-5.05 1.76-5.05 1.76s1.18-3.12-2.7-4.48c-3.88-1.36-5.29 2.38-5.29 2.38Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 23)\"><path d=\"M15 11C4.52 11 2.42 2.82 3.12 2.14 3.82 1.46 8.02 3.5 15 3.5c6.99 0 11.18-2.04 11.88-1.36.7.68-1.4 8.86-11.88 8.86Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#a0c4ff\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(1, 1) rotate(-1 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#1c799f\"/><g transform=\"translate(29 33)\"><g transform=\"translate(10, 3) rotate(0 21 21)\"><g transform=\"translate(0 4)\"><path d=\"M5 8.36S5 4 9 4s4 4.36 4 4.36v2.91s0 .73-.67.73c-.66 0-.66-2.9-3.33-2.9S6.33 12 5.67 12C5 12 5 11.27 5 11.27v-2.9ZM29 8.36S29 4 33 4s4 4.36 4 4.36v2.91s0 .73-.67.73c-.66 0-.66-2.9-3.33-2.9S30.33 12 29.67 12c-.67 0-.67-.73-.67-.73v-2.9Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 24)\"><path d=\"M15 14C1.9 14-.72 1.29.15.23 1.03-.83 6.27 2.11 15 2.11S28.97-.83 29.85.23C30.72 1.3 28.1 14 15 14Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#f1e0b0\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(-4, 2) rotate(-4 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#69d2e7\"/><g transform=\"translate(29 33)\"><g transform=\"translate(1, 3) rotate(-5 21 21)\"><g transform=\"translate(0 1)\"><path d=\"M11 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4ZM31.5 5C28.29 5 27 6.36 27 7.04c0 3.4 1.29 1.35 4.5 1.35S36 10.43 36 7.04C36 6.36 34.71 5 31.5 5Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 27)\"><path d=\"M15.5 10c-5.07 0-9.3-5.23-8.37-5.88.93-.65 3.45 2.15 8.37 2.15 4.92 0 7.44-2.88 8.37-2.15.93.73-3.3 5.88-8.37 5.88Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#bdb2ff\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(3, 1) rotate(-17 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#69d2e7\"/><g transform=\"translate(29 33)\"><g transform=\"translate(3, -7) rotate(3 21 21)\"><g transform=\"translate(0 3)\"><path d=\"M5 8.36S5 4 9 4s4 4.36 4 4.36v2.91s0 .73-.67.73c-.66 0-.66-2.9-3.33-2.9S6.33 12 5.67 12C5 12 5 11.27 5 11.27v-2.9ZM29 8.36S29 4 33 4s4 4.36 4 4.36v2.91s0 .73-.67.73c-.66 0-.66-2.9-3.33-2.9S30.33 12 29.67 12c-.67 0-.67-.73-.67-.73v-2.9Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 25)\"><path d=\"M15 14C1.9 14-.72 1.29.15.23 1.03-.83 6.27 2.11 15 2.11S28.97-.83 29.85.23C30.72 1.3 28.1 14 15 14Z\" fill=\"#ffffff\"/></g></g></g></g></g>", "<mask id=\"viewboxMask\"><rect width=\"100\" height=\"100\" rx=\"50\" ry=\"50\" x=\"0\" y=\"0\" fill=\"#fff\" /></mask><g mask=\"url(#viewboxMask)\"><rect fill=\"#ffdfba\" width=\"100\" height=\"100\" x=\"0\" y=\"0\" /><g transform=\"translate(0, -1) rotate(-2 50 70)\"><path d=\"M95 53.33C95 29.4 74.85 10 50 10S5 29.4 5 53.33V140h90V53.33Z\" fill=\"#f88c49\"/><g transform=\"translate(29 33)\"><g transform=\"translate(-15, 8) rotate(-17 21 21)\"><g transform=\"translate(0 1)\"><path d=\"M11 8c0 2.2-1.34 4-3 4s-3-1.8-3-4 1.34-4 3-4 3 1.8 3 4ZM31.5 5C28.29 5 27 6.36 27 7.04c0 3.4 1.29 1.35 4.5 1.35S36 10.43 36 7.04C36 6.36 34.71 5 31.5 5Z\" fill=\"#ffffff\"/></g><g transform=\"translate(6 27)\"><path d=\"M15 11C4.52 11 2.42 2.82 3.12 2.14 3.82 1.46 8.02 3.5 15 3.5c6.99 0 11.18-2.04 11.88-1.36.7.68-1.4 8.86-11.88 8.86Z\" fill=\"#ffffff\"/></g></g></g></g></g>"];
+function avatarSVG(i,cls){ i=Number(i)||0; i=((i%AVATARS.length)+AVATARS.length)%AVATARS.length;
+  return '<svg class="av '+(cls||'')+'" viewBox="0 0 100 100" fill="none">'+AVATARS[i]+'</svg>'; }
+
+/* ============ MANI SVG (dorso, dita evidenziabili via #ov-XX) ============ */
+function handSVG(side){
+  const ids = side==='L' ? ['L5','L4','L3','L2','L1'] : ['R5','R4','R3','R2','R1'];
+  const zs  = side==='L' ? ['--zL5','--zL4','--zL3','--zL2'] : ['--zR5','--zR4','--zR3','--zR2'];
+  const silhouette = 'M6 104 L6 47 Q6 40 13 40 Q20 40 20 47 L20 66 Q20 73 22 73 Q24 73 24 66 L24 25 '+
+    'Q24 18 31.5 18 Q39 18 39 25 L39 66 Q39 73 41 73 Q43 73 43 66 L43 19 '+
+    'Q43 12 50.5 12 Q58 12 58 19 L58 66 Q58 73 60 73 Q62 73 62 66 L62 27 '+
+    'Q62 20 69.5 20 Q77 20 77 27 L77 66 Q77 71 82 70 Q89 67 95 75 L103 87 '+
+    'Q109 94 103 102 Q95 110 88 102 L80 93 Q77 90 77 94 L77 101 Q77 126 54 126 L29 126 Q6 126 6 104 Z';
+  const fingers=[{x:14,y:48},{x:31.75,y:26},{x:50.5,y:20},{x:69.5,y:28}];
+  const nails=[[9,44,10],[27.5,22,11],[46.5,16,11],[65.5,24,11]];
+  let inner='<path class="hskin" d="'+silhouette+'"/>';
+  fingers.forEach(function(f,i){
+    inner+='<line id="ov-'+ids[i]+'" class="fg" style="--c:var('+zs[i]+')" x1="'+f.x+'" y1="'+f.y+'" x2="'+f.x+'" y2="70" stroke-width="11"/>';
+  });
+  inner+='<line id="ov-'+ids[4]+'" class="fg" style="--c:var(--zTh)" x1="84" y1="76" x2="96" y2="92" stroke-width="12"/>';
+  nails.forEach(function(n,i){ inner+='<rect x="'+n[0]+'" y="'+n[1]+'" width="8" height="'+n[2]+'" rx="4" fill="var('+zs[i]+')"/>'; });
+  inner+='<circle cx="96" cy="93" r="5" fill="var(--zTh)"/>';
+  inner+='<path class="hknuckle" d="M11 83 Q13.5 81.6 16 83 M29 81 Q31.75 79.6 34.5 81 M48 80 Q50.5 78.6 53 80 M67 81 Q69.5 79.6 72 81"/>';
+  if(side==='R') inner='<g transform="translate(112,0) scale(-1,1)">'+inner+'</g>';
+  return '<svg class="hand-svg" viewBox="0 0 112 130" role="img" aria-label="Mano '+(side==='L'?'sinistra':'destra')+'">'+inner+'</svg>';
+}
+
+/* ============ SUONI (WebAudio sintetizzati, zero file esterni) ============ */
+let sndOn = true, AC = null;
+function ac(){
+  if(!AC){ try{ AC=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } }
+  if(AC && AC.state==='suspended') AC.resume();
+  return AC;
+}
+function sndKey(){ // click meccanico: burst di rumore filtrato + "thock" basso
+  if(!sndOn) return; const a=ac(); if(!a) return; const t=a.currentTime;
+  const len=Math.floor(a.sampleRate*0.03), buf=a.createBuffer(1,len,a.sampleRate), d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.pow(1-i/len,2);
+  const src=a.createBufferSource(); src.buffer=buf;
+  const f=a.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2300; f.Q.value=.9;
+  const g=a.createGain(); g.gain.setValueAtTime(.5,t); g.gain.exponentialRampToValueAtTime(.001,t+.03);
+  src.connect(f); f.connect(g); g.connect(a.destination); src.start(t);
+  const o=a.createOscillator(), g2=a.createGain(); o.type='sine';
+  o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(85,t+.045);
+  g2.gain.setValueAtTime(.16,t); g2.gain.exponentialRampToValueAtTime(.001,t+.05);
+  o.connect(g2); g2.connect(a.destination); o.start(t); o.stop(t+.06);
+}
+function tone(freq,dt,dur,vol){
+  const a=ac(); if(!a) return; const t=a.currentTime+dt;
+  const o=a.createOscillator(), g=a.createGain(); o.type='sine'; o.frequency.value=freq;
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.02);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+.05);
+}
+function sndMiss(){ if(sndOn) tone(140,0,.09,.05); }
+function sndDone(){ if(sndOn){ tone(660,0,.16,.12); tone(880,.13,.24,.12); } }
+function sndRank(){ if(sndOn) [523,659,784,1047].forEach(function(f,i){ tone(f,i*.11,.2,.13); }); }
+function toggleSnd(){
+  sndOn=!sndOn;
+  document.getElementById('sndIcon').innerHTML=svg(sndOn?'soundOn':'soundOff');
+  document.getElementById('sndLbl').textContent=sndOn?'Suoni attivi':'Suoni spenti';
+  document.getElementById('sndBtn').classList.toggle('muted',!sndOn);
+  document.getElementById('sndBtn').blur();
+}
+
+/* ============ GRADI (premi intermedi) ============ */
+const RANKS=[
+  {n:"Novizio",p:0},{n:"Apprendista",p:500},{n:"Scrivano",p:1200},{n:"Dattilografo",p:2200},
+  {n:"Esperto",p:3500},{n:"Ninja",p:5200},{n:"Maestro",p:7500},{n:"Leggenda",p:10000}
+];
+function rankIdx(pts){ let i=0; RANKS.forEach(function(r,k){ if(pts>=r.p) i=k; }); return i; }
+function updateRankUI(){
+  const i=rankIdx(st.score), cur=RANKS[i], next=RANKS[i+1];
+  document.getElementById('rankBadge').innerHTML=svg('medal')+'<span>'+cur.n+'</span>';
+  document.getElementById('rankNext').textContent = next ? (next.p-st.score)+' punti a '+next.n : 'grado massimo';
+  document.getElementById('rankBar').style.width = next ? Math.min(100,Math.round((st.score-cur.p)/(next.p-cur.p)*100))+'%' : '100%';
+}
+let toastTimer=null;
+function showToast(html){
+  const t=document.getElementById('toast'); t.innerHTML=html; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){ t.classList.remove('show'); },2600);
+}
+
+/* ============ CLASSIFICA LIVE (solo studenti reali e presenti) ============ */
+function lbPush(){
+  if(!LB_URL) return;
+  // NB: il parametro si chiama "sess", NON "sid": "sid" è riservato da Google
+  // e fa fallire la richiesta con una pagina d'errore prima di arrivare allo script.
+  const q=new URLSearchParams({action:'ping',sess:SESSION_ID,nick:st.user,cls:st.cls,
+    topic:st.topic,day:dayStr(),score:st.score,done:st.done,av:st.avatar});
+  new Image().src = LB_URL+'?'+q.toString(); // image-pixel GET: CSP-safe, niente CORS
+}
+function lbPoll(){
+  if(!LB_URL){ renderBoard(null); return; }
+  fetch(LB_URL+'?'+new URLSearchParams({action:'board',topic:st.topic,day:dayStr()}))
+    .then(function(r){ return r.json(); })
+    .then(function(j){ renderBoard(j && j.ok ? j.rows : null); })
+    .catch(function(){ renderBoard(null); });
+}
+function renderBoard(rows){
+  const el=document.getElementById('boardList');
+  if(!rows){
+    el.innerHTML = '<div class="board-empty">'+(LB_URL
+      ? 'Connessione alla classifica…'
+      : 'La classifica si attiva quando il prof collega il foglio dei punteggi.')+'</div>';
+    return;
+  }
+  if(!rows.length){ el.innerHTML='<div class="board-empty">In questo momento sei il primo sul pool di oggi: chi inizia ora apparirà qui.</div>'; return; }
+  el.innerHTML = rows.map(function(r,i){
+    const me = r[3]===SESSION_ID;
+    return '<div class="board-row'+(me?' me':'')+(i===0?' top':'')+'">'+
+      '<span class="pos">'+(i+1)+'</span>'+
+      '<span class="bav">'+avatarSVG(r[4])+'</span>'+
+      '<span class="bnick">'+esc(r[0])+(me?' · tu':'')+'</span>'+
+      '<span class="bdone">'+r[2]+' frasi</span>'+
+      '<span class="bpts">'+r[1]+'</span></div>';
+  }).join('');
+}
+let lbTimers=[];
+function lbStart(){
+  lbTimers.forEach(clearInterval); lbTimers=[];
+  lbPush(); lbPoll();
+  if(LB_URL){
+    lbTimers.push(setInterval(lbPush,LB_PUSH_MS));
+    lbTimers.push(setInterval(lbPoll,LB_POLL_MS));
+  }
 }
 
 /* ============ MUSICA ============ */
@@ -662,7 +837,7 @@ function arrowsHTML(interactive){
 }
 
 /* ============ STATO ============ */
-let st = {user:"",cls:"",topic:"",score:0,idx:0,typed:"",caps:false,isSec:false,fullText:"",done:0,db:[]};
+let st = {user:"",cls:"",topic:"",avatar:0,score:0,idx:0,typed:"",caps:false,isSec:false,fullText:"",done:0,db:[]};
 let nj = {lvl:0,qIdx:0,input:[],currentQ:null};
 
 const ninjaLevels = [
@@ -676,11 +851,13 @@ function generateDB(topic){
   const pr = premiumPhrases[topic]||premiumPhrases.cucina;
   const sg = semantics[topic]||semantics.cucina;
   const db = pr.slice();
+  // PRNG seedato giorno+topic: tutti i partecipanti di oggi hanno lo stesso pool
+  const rand = mulberry32(hashStr(dayStr()+'|'+topic));
   for(let i=db.length;i<200;i++){
-    const g = sg[Math.floor(Math.random()*sg.length)];
-    const s = g.s[Math.floor(Math.random()*g.s.length)];
-    const v = g.v[Math.floor(Math.random()*g.v.length)];
-    const c = g.c[Math.floor(Math.random()*g.c.length)];
+    const g = sg[Math.floor(rand()*sg.length)];
+    const s = g.s[Math.floor(rand()*g.s.length)];
+    const v = g.v[Math.floor(rand()*g.v.length)];
+    const c = g.c[Math.floor(rand()*g.c.length)];
     db.push({n:"Allenamento "+(i+1),t:s+" "+v+" "+c,l:g.l,lat:g.lat,lon:g.lon});
   }
   return db;
@@ -691,9 +868,15 @@ function initIcons(){
   document.getElementById('loginBrand').innerHTML = brandHTML();
   document.getElementById('appBrand').innerHTML = brandHTML();
   document.getElementById('musicIcon').innerHTML = svg('soundOff');
+  document.getElementById('sndIcon').innerHTML = svg('soundOn');
   document.getElementById('exitIcon').innerHTML = svg('exit');
   document.getElementById('ninjaIcon').innerHTML = svg('trophy');
   document.getElementById('backIcon').innerHTML = svg('back');
+  document.getElementById('handsWrap').innerHTML = handSVG('L')+handSVG('R');
+  // picker avatar
+  document.getElementById('avPick').innerHTML = AVATARS.map(function(_,i){
+    return '<button type="button" class="av-btn'+(i===st.avatar?' sel':'')+'" onclick="pickAv('+i+')" aria-label="Avatar '+(i+1)+'">'+avatarSVG(i)+'</button>';
+  }).join('');
   // legenda dita
   const legend = [['L5','mignolo'],['L4','anulare'],['L3','medio'],['L2','indice'],
                   ['R2','indice'],['R3','medio'],['R4','anulare'],['R5','mignolo']];
@@ -715,8 +898,11 @@ function avviaSuite(){
 
   const conf = topicsConfig[st.topic];
   document.getElementById('topicTitle').textContent = conf.title;
+  document.getElementById('profAv').innerHTML = avatarSVG(st.avatar);
+  document.getElementById('profNick').textContent = st.user;
+  document.getElementById('profCls').textContent = document.querySelector('#classSelect option[value="'+st.cls+'"]').textContent;
   document.getElementById('scoreNum').textContent = "0";
-  document.getElementById('rewards').innerHTML = "";
+  document.getElementById('doneNum').textContent = "0";
   document.getElementById('bgMusic').src = playlist[0];
 
   document.getElementById('loginScreen').classList.add('hidden');
@@ -724,8 +910,14 @@ function avviaSuite(){
 
   buildKeyboard('kbdChef',{zones:true});
   buildKeyboard('kbdNinja',{interactive:true});
+  updateRankUI();
+  lbStart();
   caricaEsercizio();
   window.addEventListener('keydown', handleGlobalKey);
+}
+function pickAv(i){
+  st.avatar=i;
+  document.querySelectorAll('#avPick .av-btn').forEach(function(b,k){ b.classList.toggle('sel',k===i); });
 }
 function shakeLogin(){
   const m=document.querySelector('.login-modal');
@@ -744,10 +936,9 @@ function caricaEsercizio(){
   st.typed = "";
 
   const conf = topicsConfig[st.topic];
-  document.getElementById('dishName').innerHTML = svg(conf.icon,'ic')+'<span>'+esc(r.n)+'</span>';
-  document.getElementById('loc').innerHTML = svg('pin')+'<span>'+esc(r.l)+'</span>';
-  document.getElementById('mapFrame').src =
-    'https://maps.google.com/maps?q='+r.lat+','+r.lon+'&t=h&z=9&ie=UTF8&iwloc=B&output=embed';
+  document.getElementById('dishName').innerHTML =
+    svg(conf.icon,'ic')+'<span>'+esc(r.n)+'</span>'+
+    '<span style="color:var(--faint)">·</span>'+svg('pin','ic')+'<span>'+esc(r.l)+'</span>';
 
   aggiornaDisplay();
   aggiornaVisivo();
@@ -763,13 +954,13 @@ function aggiornaDisplay(){
 }
 
 function aggiornaVisivo(){
-  document.querySelectorAll('.finger').forEach(function(f){f.classList.remove('active');});
+  document.querySelectorAll('.hand-svg .fg').forEach(function(f){f.classList.remove('on');});
   document.querySelectorAll('#kbdChef .key').forEach(function(k){k.classList.remove('hint');});
   const next = st.fullText.charAt(st.typed.length);
   if(!next) return;
   const info = charInfo(next);
   if(!info) return;
-  info.fingers.forEach(function(f){ const el=document.getElementById(f); if(el) el.classList.add('active'); });
+  info.fingers.forEach(function(f){ const el=document.getElementById('ov-'+f); if(el) el.classList.add('on'); });
   info.keys.forEach(function(kid){
     const el=document.querySelector('#kbdChef .key[data-k="'+kid+'"]'); if(el) el.classList.add('hint');
   });
@@ -784,8 +975,9 @@ function handleGlobalKey(e){
   const char = st.fullText.charAt(st.typed.length);
   if(!char) return;
   const match = e.key===char || (st.caps && e.key.length===1 && e.key.toUpperCase()===char);
-  if(!match) return;
+  if(!match){ if(e.key.length===1) sndMiss(); return; }
 
+  sndKey();
   st.typed += char;
   const info = charInfo(char);
   if(info){ const k=document.querySelector('#kbdChef .key[data-k="'+info.key+'"]');
@@ -793,20 +985,25 @@ function handleGlobalKey(e){
 
   aggiornaDisplay();
   if(st.typed.length===st.fullText.length){
+    const prevRank = rankIdx(st.score);
     st.score += st.fullText.length*10;
+    st.done++;
     document.getElementById('scoreNum').textContent = st.score;
-    addReward();
+    document.getElementById('doneNum').textContent = st.done;
+    updateRankUI();
+    const newRank = rankIdx(st.score);
+    if(newRank>prevRank){
+      sndRank();
+      showToast(svg('medal')+'<span>Nuovo grado: <b>'+RANKS[newRank].n+'</b></span>');
+    } else {
+      sndDone();
+    }
+    lbPush();
     st.idx++;
     setTimeout(caricaEsercizio, 620);
   } else {
     aggiornaVisivo();
   }
-}
-
-function addReward(){
-  st.done++;
-  const el=document.createElement('div'); el.className='reward'; el.innerHTML=svg('check');
-  document.getElementById('rewards').appendChild(el);
 }
 
 /* ============ MUSICA ============ */
@@ -855,6 +1052,7 @@ function askNinja(){
   renderCombo();
 }
 function ninjaPress(id){
+  sndKey();
   const i=nj.input.indexOf(id);
   if(i>=0) nj.input.splice(i,1); else nj.input.push(id);
   document.querySelectorAll('#kbdNinja [data-k]').forEach(function(el){
@@ -864,9 +1062,9 @@ function ninjaPress(id){
   if(nj.input.length===nj.currentQ.k.length){
     const ok = nj.currentQ.k.every(function(k){return nj.input.indexOf(k)>=0;});
     const q=document.getElementById('ninjaQuestion');
-    if(ok){ q.className='ninja-q ok'; q.textContent='Corretto!';
+    if(ok){ q.className='ninja-q ok'; q.textContent='Corretto!'; sndDone();
       setTimeout(function(){nj.qIdx++; askNinja();},850);
-    } else { q.className='ninja-q warn';
+    } else { q.className='ninja-q warn'; sndMiss();
       setTimeout(function(){ nj.input=[]; askNinja(); },850);
     }
   }
