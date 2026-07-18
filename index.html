@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keyboard Training · Scuola Sacra Famiglia</title>
+<link rel="icon" href="logo.svg">
+<link rel="apple-touch-icon" href="logo.png">
+<style>
+:root{
+  /* Tema Apple white */
+  --bg:#f5f5f7; --bg2:#fbfbfd; --card:#ffffff; --panel:#f5f5f7;
+  --ink:#1d1d1f; --muted:#6e6e73; --faint:#a1a1a6; --line:#d2d2d7;
+  --blue:#0071e3; --blue2:#2997ff; --blueD:#0058b0; --blueL:rgba(0,113,227,.10);
+  --amber:#b8860b; --amber2:#d4a017; --amberL:rgba(184,134,11,.12);
+  --green:#1d8a4e; --greenL:#e8f6ee;
+  --shadow:0 4px 24px rgba(0,0,0,.06);
+  --shadow2:0 12px 40px rgba(0,0,0,.12);
+  --sys:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"SF Mono",ui-monospace,"Menlo","Monaco",monospace;
+  /* Zone dita (pastello, nessun rosso) */
+  --zL5:#f5b784; --zL4:#f3ce7e; --zL3:#cde28c; --zL2:#9bd9a6;
+  --zR2:#8fd3da; --zR3:#9bbdf0; --zR4:#b3a6f0; --zR5:#d9a6f0; --zTh:#c7c7cc;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;width:100vw;height:100vh;overflow:hidden}
+body{font-family:var(--sys);background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;display:flex;flex-direction:column}
+button{font-family:inherit}
+svg{display:block}
+
+/* ---------- BRAND ---------- */
+.brand{display:inline-flex;align-items:center;gap:11px}
+.brand-mark{width:40px;height:40px;flex:0 0 auto;border-radius:11px}
+.brand-txt{display:flex;flex-direction:column;text-align:left;line-height:1.18}
+.brand-name{font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--ink)}
+.brand-role{font-size:11.5px;font-weight:500;letter-spacing:.2px;color:var(--muted)}
+
+/* ---------- LOGIN ---------- */
+#loginScreen{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% -10%,#ffffff 0%,#ececed 60%,#e4e4e7 100%);padding:24px}
+.login-modal{background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(20px);
+  -webkit-backdrop-filter:saturate(180%) blur(20px);border:1px solid rgba(0,0,0,.06);
+  padding:38px 40px 34px;border-radius:28px;box-shadow:var(--shadow2);width:560px;max-width:100%;text-align:center}
+.login-brand{display:flex;justify-content:center;margin-bottom:18px}
+.login-title{font-size:2rem;font-weight:700;letter-spacing:-.02em;margin:2px 0 4px}
+.login-sub{font-size:1rem;font-weight:400;color:var(--muted);margin:0 0 24px}
+.field-lbl{display:block;text-align:left;font-size:.82rem;font-weight:600;color:var(--muted);margin:14px 2px 6px}
+input,select{width:100%;padding:14px 15px;border-radius:13px;border:1px solid var(--line);
+  font-size:1.02rem;font-family:inherit;color:var(--ink);outline:none;background:#fff;transition:.15s}
+input::placeholder{color:var(--faint)}
+input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 4px var(--blueL)}
+select{appearance:none;-webkit-appearance:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path d='M3 5l4 4 4-4' fill='none' stroke='%236e6e73' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+  background-repeat:no-repeat;background-position:right 15px center;padding-right:38px}
+.btn-start{width:100%;padding:15px;margin-top:26px;background:var(--blue);color:#fff;border:none;border-radius:13px;
+  font-size:1.08rem;font-weight:600;letter-spacing:.2px;cursor:pointer;transition:transform .1s,background .15s}
+.btn-start:hover{background:var(--blueD)} .btn-start:active{transform:scale(.985)}
+
+/* ---------- APP ---------- */
+#appContainer{display:none;height:100vh;width:100vw;grid-template-columns:1fr 380px}
+.game-zone{position:relative;display:flex;flex-direction:column;padding:16px 34px 20px;
+  border-right:1px solid var(--line);min-width:0;background:var(--bg2)}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex:none;height:44px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+  border-radius:20px;padding:7px 13px;font-size:.86rem;font-weight:600;color:var(--ink);cursor:pointer;
+  transition:.12s;box-shadow:var(--shadow)}
+.chip:hover{border-color:var(--blue);color:var(--blue)}
+.chip svg{width:16px;height:16px}
+.chip.muted{color:var(--muted)}
+.audio-wrap{display:flex;align-items:center;gap:8px}
+.track-select{width:150px;padding:8px 30px 8px 12px;border-radius:20px;font-size:.84rem;font-weight:600;
+  border:1px solid var(--line);background:var(--card);box-shadow:var(--shadow)}
+
+.header-display{flex:none;text-align:center;margin:4px 0 2px}
+.topic-title{font-size:1.5rem;font-weight:700;letter-spacing:-.02em;margin:6px 0 2px;color:var(--ink)}
+.dish-name{display:inline-flex;align-items:center;gap:9px;font-size:1rem;font-weight:600;color:var(--muted);min-height:1.4em}
+.dish-name .ic{width:20px;height:20px;color:var(--blue)}
+
+.stage{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:14px;align-items:center}
+.phrase-container{width:100%;max-width:900px;background:var(--card);border:1px solid var(--line);
+  border-radius:20px;box-shadow:var(--shadow);padding:26px 32px;min-height:120px;
+  display:flex;align-items:center;justify-content:flex-start}
+.text-wrapper{width:100%;white-space:pre-wrap;word-break:break-word;font-family:var(--mono);
+  font-size:1.7rem;font-weight:500;line-height:1.55;letter-spacing:.02em;text-align:left}
+.text-done{color:var(--blue)}
+.text-todo{color:#c7c7cc}
+.text-next{color:var(--ink);background:var(--blueL);border-radius:4px;padding:0 1px}
+.text-cursor{display:inline-block;width:2px;height:1.35em;background:var(--blue);vertical-align:text-bottom;
+  border-radius:2px;animation:blink 1.05s steps(1) infinite;margin:0 1px}
+@keyframes blink{50%{opacity:0}}
+
+/* Mani */
+.hands{display:flex;justify-content:center;gap:74px;align-items:flex-end;height:96px}
+.hand{display:flex;align-items:flex-end;gap:7px;height:100%}
+.hand.right{flex-direction:row}
+.finger{width:20px;border-radius:11px 11px 5px 5px;border:1px solid rgba(0,0,0,.10);
+  background:var(--zTh);transition:transform .09s,box-shadow .09s,filter .09s}
+.finger.active{transform:translateY(-14px);box-shadow:0 8px 16px rgba(0,113,227,.28),0 0 0 3px var(--blue);
+  filter:saturate(1.15);z-index:2}
+.f-thumb{height:38px} .f-index{height:74px} .f-mid{height:90px} .f-ring{height:80px} .f-pinky{height:60px}
+.thumb-l{transform-origin:bottom right;transform:rotate(28deg)}
+.thumb-r{transform-origin:bottom left;transform:rotate(-28deg)}
+.thumb-l.active,.thumb-r.active{transform:translateY(-14px)}
+#L5{background:var(--zL5)} #L4{background:var(--zL4)} #L3{background:var(--zL3)} #L2{background:var(--zL2)}
+#R2{background:var(--zR2)} #R3{background:var(--zR3)} #R4{background:var(--zR4)} #R5{background:var(--zR5)}
+
+/* ---------- TASTIERA (Magic Keyboard ISO) ---------- */
+.kbd-wrap{background:linear-gradient(#f6f7f9,#dcdee2);border:1px solid #cbcdd3;border-radius:16px;
+  padding:11px;box-shadow:0 18px 34px rgba(0,0,0,.14),inset 0 1px 2px rgba(255,255,255,.7);
+  display:flex;flex-direction:column;gap:6px;width:100%;max-width:920px}
+.krow{display:flex;gap:6px;height:46px}
+.krow.f{height:32px}
+.key{position:relative;flex:1;background:linear-gradient(#ffffff,#eceef1);border:1px solid #c9cbd1;
+  border-bottom-width:2px;border-radius:8px;color:#2a2a2e;font-weight:500;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:default;user-select:none;overflow:hidden;transition:transform .05s,box-shadow .08s,background .08s}
+.krow.f .key{border-radius:6px}
+.key .mn{font-size:.98rem;font-weight:500}
+.key .sub{position:absolute;top:3px;left:6px;font-size:.56rem;color:var(--faint);font-family:var(--mono)}
+.key .glyph{font-size:.9rem}
+.key .glyph.tiny{font-size:.6rem}
+.key .lbl{font-size:.62rem;color:#3a3a3e}
+.key .word{font-size:.44rem;color:var(--faint);text-transform:lowercase;margin-top:1px;font-weight:600}
+.key .fic{width:16px;height:16px;color:#3a3a3e}
+.key.al-s{align-items:flex-start;padding-left:9px}
+.key.al-e{align-items:flex-end;padding-right:9px}
+/* zone tint (barra inferiore colorata sul keycap) */
+.key.z-L5{box-shadow:inset 0 -3px 0 var(--zL5)} .key.z-L4{box-shadow:inset 0 -3px 0 var(--zL4)}
+.key.z-L3{box-shadow:inset 0 -3px 0 var(--zL3)} .key.z-L2{box-shadow:inset 0 -3px 0 var(--zL2)}
+.key.z-R2{box-shadow:inset 0 -3px 0 var(--zR2)} .key.z-R3{box-shadow:inset 0 -3px 0 var(--zR3)}
+.key.z-R4{box-shadow:inset 0 -3px 0 var(--zR4)} .key.z-R5{box-shadow:inset 0 -3px 0 var(--zR5)}
+.key.z-Th{box-shadow:inset 0 -3px 0 var(--zTh)}
+/* stati */
+.key.hint{background:linear-gradient(var(--blue2),var(--blue));color:#fff;border-color:var(--blueD);
+  box-shadow:0 0 0 3px var(--blueL),0 6px 14px rgba(0,113,227,.35);transform:translateY(-1px);z-index:3}
+.key.hint .mn,.key.hint .glyph,.key.hint .lbl,.key.hint .sub,.key.hint .word,.key.hint .fic{color:#fff}
+.key.press{transform:translateY(1px);background:linear-gradient(#e9edf3,#dde2ea)}
+.key.armed{background:linear-gradient(var(--blue2),var(--blue));color:#fff;border-color:var(--blueD)}
+.key.armed .glyph,.key.armed .mn,.key.armed .lbl,.key.armed .word,.key.armed .sub{color:#fff}
+/* frecce */
+.arrows{display:flex;flex-direction:column;justify-content:flex-end;gap:2px;flex:2}
+.arr-r{display:flex;gap:3px;flex:1}
+.arr{flex:1;background:linear-gradient(#ffffff,#eceef1);border:1px solid #c9cbd1;border-bottom-width:2px;
+  border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#3a3a3e}
+.arr.blank{background:none;border:none}
+.arr.half{max-height:50%}
+
+/* Legenda dita */
+.legend{flex:none;display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:center;margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;color:var(--muted);font-weight:600}
+.legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{background:var(--card);display:flex;flex-direction:column;gap:14px;padding:20px;overflow-y:auto}
+.card-lite{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.score-card{text-align:center;padding:18px 16px}
+.score-num{font-size:2.1rem;font-weight:700;letter-spacing:-.02em;color:var(--blue);line-height:1}
+.score-lbl{font-size:.74rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.sec-lbl{font-size:.72rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.rewards{display:flex;flex-wrap:wrap;gap:6px;min-height:30px}
+.reward{width:26px;height:26px;border-radius:8px;background:var(--greenL);color:var(--green);
+  display:flex;align-items:center;justify-content:center;animation:popIn .32s}
+.reward svg{width:15px;height:15px}
+.loc{display:flex;align-items:center;gap:8px;font-size:.92rem;font-weight:600;color:var(--ink)}
+.loc svg{width:17px;height:17px;color:var(--blue);flex:0 0 auto}
+#mapContainer{flex:1;min-height:200px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}
+#mapFrame{width:100%;height:100%;border:none;display:block}
+.btn-ninja{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:13px;
+  font-size:.96rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.12s}
+.btn-ninja:hover{background:#000} .btn-ninja svg{width:18px;height:18px}
+@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+
+/* ---------- NINJA ---------- */
+#ninjaApp{display:none;height:100vh;width:100vw;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(120% 120% at 50% 0%,#1c1c1e 0%,#0c0c0e 100%);color:#fff;position:relative}
+.ninja-wrap{width:92%;max-width:1000px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:18px}
+.ninja-lvl{font-size:.8rem;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#8e8e93}
+.ninja-lvl b{color:var(--blue2)}
+.ninja-q{font-size:2.6rem;font-weight:700;letter-spacing:-.02em;margin:4px 0}
+.ninja-hint{font-size:.95rem;color:#98989d;margin-top:-6px}
+.ninja-combo{display:flex;gap:10px;justify-content:center;min-height:56px;align-items:center;flex-wrap:wrap}
+.combo-key{background:#2c2c2e;color:#fff;border:1px solid #48484a;border-radius:11px;
+  padding:12px 20px;font-weight:600;font-size:1.2rem;min-width:54px}
+.combo-plus{color:#636366;font-size:1.4rem;font-weight:700}
+.combo-ph{color:#48484a;font-size:.95rem}
+.ninja-q.ok{color:#30d158} .ninja-q.warn{color:var(--amber2);animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+#kbdNinja.kbd-wrap{background:linear-gradient(#3a3a3c,#1c1c1e);border-color:#000;
+  box-shadow:0 24px 50px rgba(0,0,0,.6)}
+#kbdNinja .key{background:linear-gradient(#48484a,#333335);border-color:#000;color:#f2f2f7;cursor:pointer}
+#kbdNinja .key .sub,#kbdNinja .key .word,#kbdNinja .key .lbl{color:#98989d}
+#kbdNinja .key .fic{color:#c7c7cc}
+#kbdNinja .key:hover{background:linear-gradient(#5a5a5c,#3a3a3c)}
+#kbdNinja .arr{background:linear-gradient(#48484a,#333335);border-color:#000;color:#c7c7cc}
+.btn-back{position:absolute;top:22px;left:22px;background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.18);
+  padding:9px 15px;border-radius:20px;font-weight:600;font-size:.88rem;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.btn-back:hover{background:rgba(255,255,255,.18)} .btn-back svg{width:15px;height:15px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<audio id="bgMusic" loop><source id="audioSrc" src="" type="audio/mpeg"></audio>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="loginScreen">
+  <div class="login-modal">
+    <div class="login-brand" id="loginBrand"></div>
+    <div class="login-title">Keyboard Training</div>
+    <div class="login-sub">Laboratorio di Informatica · Esercizi di dattilografia del prof. Andrea Cerioli</div>
+
+    <label class="field-lbl" for="nameInput">Il tuo nome</label>
+    <input type="text" id="nameInput" placeholder="Scrivi il tuo nome…" autocomplete="off">
+
+    <label class="field-lbl" for="classSelect">La tua classe</label>
+    <select id="classSelect">
+      <option value="" disabled selected>Seleziona la classe…</option>
+      <optgroup label="Primaria (STAMPATO MAIUSCOLO)">
+        <option value="1AP">1A Primaria</option><option value="1BP">1B Primaria</option>
+        <option value="2AP">2A Primaria</option><option value="2BP">2B Primaria</option>
+      </optgroup>
+      <optgroup label="Primaria (minuscolo)">
+        <option value="3AP">3A Primaria</option><option value="3BP">3B Primaria</option>
+        <option value="4AP">4A Primaria</option><option value="4BP">4B Primaria</option>
+        <option value="5AP">5A Primaria</option><option value="5BP">5B Primaria</option>
+      </optgroup>
+      <optgroup label="Secondaria (testi avanzati)">
+        <option value="1AS">1A Secondaria</option><option value="1BS">1B Secondaria</option><option value="1CS">1C Secondaria</option>
+        <option value="2AS">2A Secondaria</option><option value="2BS">2B Secondaria</option><option value="2CS">2C Secondaria</option>
+        <option value="3AS">3A Secondaria</option><option value="3BS">3B Secondaria</option><option value="3CS">3C Secondaria</option>
+      </optgroup>
+    </select>
+
+    <label class="field-lbl" for="topicSelect">La tua passione</label>
+    <select id="topicSelect">
+      <option value="" disabled selected>Scegli l'argomento…</option>
+      <option value="cucina">Cucina e ricette tipiche</option>
+      <option value="basket">Basket e NBA</option>
+      <option value="pesca">Pesca e natura</option>
+      <option value="calcio">Champions League</option>
+      <option value="ippica">Cavalli e ippica</option>
+      <option value="nerd">Tecnologia e gaming</option>
+      <option value="viaggi">Viaggi in Italia</option>
+      <option value="volley">Pallavolo nazionale</option>
+      <option value="gym">Ginnastica artistica</option>
+      <option value="moto">Motori e motocross</option>
+      <option value="music">Strumenti musicali</option>
+    </select>
+
+    <button class="btn-start" onclick="avviaSuite()">Inizia l'addestramento</button>
+  </div>
+</div>
+
+<!-- ==================== APP ==================== -->
+<div id="appContainer">
+  <div class="game-zone">
+    <div class="topbar">
+      <div class="audio-wrap">
+        <button class="chip muted" id="musicBtn" onclick="toggleMusic()"><span id="musicIcon"></span><span id="musicLbl">Musica</span></button>
+        <select id="trackSelect" class="track-select" onchange="cambiaTraccia(this)">
+          <option value="0">Command</option><option value="1">La Collina</option><option value="2">Bag Raiders</option><option value="3">Pink · Try</option>
+        </select>
+      </div>
+      <div id="appBrand"></div>
+      <button class="chip" onclick="esciLogin()"><span id="exitIcon"></span>Esci</button>
+    </div>
+
+    <div class="header-display">
+      <div id="topicTitle" class="topic-title">Caricamento…</div>
+      <div id="dishName" class="dish-name"></div>
+    </div>
+
+    <div class="stage">
+      <div class="phrase-container"><div id="phraseText" class="text-wrapper"></div></div>
+
+      <div class="hands">
+        <div class="hand left">
+          <div class="finger f-pinky" id="L5"></div><div class="finger f-ring" id="L4"></div>
+          <div class="finger f-mid" id="L3"></div><div class="finger f-index" id="L2"></div>
+          <div class="finger f-thumb thumb-l" id="L1"></div>
+        </div>
+        <div class="hand right">
+          <div class="finger f-thumb thumb-r" id="R1"></div><div class="finger f-index" id="R2"></div>
+          <div class="finger f-mid" id="R3"></div><div class="finger f-ring" id="R4"></div>
+          <div class="finger f-pinky" id="R5"></div>
+        </div>
+      </div>
+
+      <div class="kbd-wrap" id="kbdChef"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="card-lite score-card">
+      <div class="score-num" id="scoreNum">0</div>
+      <div class="score-lbl">Punti</div>
+    </div>
+    <div class="card-lite">
+      <div class="sec-lbl">Traguardi</div>
+      <div class="rewards" id="rewards"></div>
+    </div>
+    <div class="card-lite"><div class="loc" id="loc"></div></div>
+    <div id="mapContainer"><iframe id="mapFrame" title="Mappa del luogo"></iframe></div>
+    <button class="btn-ninja" onclick="goToNinja()"><span id="ninjaIcon"></span>Allenamento Ninja</button>
+  </aside>
+</div>
+
+<!-- ==================== NINJA ==================== -->
+<div id="ninjaApp">
+  <button class="btn-back" onclick="backToMain()"><span id="backIcon"></span>Torna indietro</button>
+  <div class="ninja-wrap">
+    <div class="ninja-lvl">Livello <b id="ninjaLevel">1</b></div>
+    <div id="ninjaQuestion" class="ninja-q">Pronto?</div>
+    <div class="ninja-hint">Clicca la combinazione sulla tastiera qui sotto</div>
+    <div id="ninjaCombo" class="ninja-combo"></div>
+    <div class="kbd-wrap" id="kbdNinja"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============ ICONE SVG (zero emoji) ============ */
+const ICONS = {
+  keyboard:'<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><path d="M6 10h.01M9 10h.01M12 10h.01M15 10h.01M18 10h.01M7 14h10"/>',
+  soundOn:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/>',
+  soundOff:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/>',
+  exit:'<path d="M10 4H5v16h5"/><path d="M15 8l4 4-4 4M19 12H9"/>',
+  pin:'<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/>',
+  trophy:'<path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M9 15h6M10 19h4M12 15v4"/>',
+  check:'<path d="M4 12l5 5L20 6"/>',
+  back:'<path d="M15 6l-6 6 6 6"/>',
+  // topic
+  cucina:'<path d="M7 14h10v5a1 1 0 0 1-1 1H8a1 1 0 0 1-1-1v-5z"/><path d="M7 14a4 4 0 0 1-1-7.8A3.5 3.5 0 0 1 12 4a3.5 3.5 0 0 1 6 2.2A4 4 0 0 1 17 14"/>',
+  basket:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18M5.6 5.6c3 2 3 10.8 0 12.8M18.4 5.6c-3 2-3 10.8 0 12.8"/>',
+  pesca:'<path d="M3 12c3-4 8-5 12-3 2 1 4 2 6 3-2 1-4 2-6 3-4 2-9 1-12-3z"/><path d="M21 12l1-3M21 12l1 3M8 11h.01"/>',
+  calcio:'<circle cx="12" cy="12" r="9"/><path d="M12 8l2.8 2-1 3.3h-3.6l-1-3.3L12 8zM12 3v3M4 9l3 2M20 9l-3 2M8 20l1-3M16 20l-1-3"/>',
+  ippica:'<path d="M6 20c-1-4-2-7 0-10 1-1.5 1-3 0-4l3 1c2 .5 3 2 3 4l3 1c2 1 3 3 3 6"/><path d="M8 7l-.5-2"/>',
+  nerd:'<rect x="3" y="8" width="18" height="9" rx="4.5"/><path d="M8 11v3M6.5 12.5h3M15 12h.01M17.5 13.5h.01"/>',
+  viaggi:'<path d="M3 12l17-7-4 16-4-6-5-3z"/><path d="M12 15l4-6"/>',
+  volley:'<circle cx="12" cy="12" r="9"/><path d="M12 3c-3 5-3 12 4 17M21 10c-5-1-11 1-14 8M3 13c5-3 7-9 6-9.7"/>',
+  gym:'<path d="M12 4l2.2 4.6L19 9.4l-3.5 3.4.8 4.9L12 15.4 7.7 17.7l.8-4.9L5 9.4l4.8-.8L12 4z"/>',
+  moto:'<circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M6 17l3-5h5l2 5M9 12l-1-3H6M14 12l3-1 2 2M12 9h4"/>',
+  music:'<path d="M9 18V6l10-2v11"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="15" r="2.5"/>',
+  // fila funzione mac
+  sunLow:'<circle cx="12" cy="12" r="3"/><path d="M12 6v1M12 17v1M6 12h1M17 12h1"/>',
+  sunHigh:'<circle cx="12" cy="12" r="3.5"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6 6l1.4 1.4M16.6 16.6L18 18M18 6l-1.4 1.4M7.4 16.6L6 18"/>',
+  grid:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',
+  search:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/>',
+  moon:'<path d="M20 14a8 8 0 1 1-9-10 6.5 6.5 0 0 0 9 10z"/>',
+  prev:'<path d="M18 6v12L9 12l9-6zM7 5v14"/>',
+  play:'<path d="M8 5v14l11-7-11-7z"/>',
+  next:'<path d="M6 6v12l9-6-9-6zM17 5v14"/>',
+  volMute:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M17 9l4 6M21 9l-4 6"/>',
+  volDown:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 9.5a4 4 0 0 1 0 5"/>',
+  volUp:'<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6.5a8 8 0 0 1 0 11"/>'
+};
+function svg(name,cls){
+  return '<svg class="'+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" '+
+    'stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">'+ICONS[name]+'</svg>';
+}
+function brandHTML(){
+  return '<div class="brand"><svg class="brand-mark" viewBox="0 0 40 40" aria-label="Scuola Sacra Famiglia">'+
+    '<rect x="0" y="0" width="40" height="40" rx="11" fill="#123E90"/>'+
+    '<rect x="7" y="14" width="26" height="16" rx="3" fill="none" stroke="#fff" stroke-width="1.6"/>'+
+    '<g fill="#fff"><rect x="10.5" y="17.5" width="2.4" height="2.4" rx=".6"/><rect x="15" y="17.5" width="2.4" height="2.4" rx=".6"/>'+
+    '<rect x="19.5" y="17.5" width="2.4" height="2.4" rx=".6"/><rect x="24" y="17.5" width="2.4" height="2.4" rx=".6"/>'+
+    '<rect x="28.5" y="17.5" width="1.6" height="2.4" rx=".6" opacity=".6"/>'+
+    '<rect x="13" y="24" width="14" height="2.4" rx="1.2"/></g>'+
+    '<path d="M30 8.5l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z" fill="#D4A017"/></svg>'+
+    '<div class="brand-txt"><span class="brand-name">Scuola Sacra Famiglia</span>'+
+    '<span class="brand-role">Animatore Digitale · Andrea Cerioli</span></div></div>';
+}
+
+/* ============ MUSICA ============ */
+const playlist = [
+  "https://www.dropbox.com/scl/fi/al2a22ep2jsuj0udglewl/Command.mp3?rlkey=i01sj0grxt2v0d14i28fsaybp&dl=1",
+  "https://www.dropbox.com/scl/fi/j41ryhy8mtcu7noef2h8q/lacollina.mp3?rlkey=x6ydcize55i292997ikm1kpws&dl=1",
+  "https://www.dropbox.com/scl/fi/kvwa7yevfxrqhenp77cn0/BagRaiders.mp3?rlkey=mtoj2x3xr0e5f4zkg8vuk9o9z&dl=1",
+  "https://www.dropbox.com/scl/fi/ca7vu6o5nwlllcyvjd36g/Pink_try.mp3?rlkey=bnju2holjezxznkhixdxemdub&dl=1"
+];
+let isPlaying = false;
+
+/* ============ CONFIG ARGOMENTI ============ */
+const topicsConfig = {
+  cucina:{title:"Chef Academy",   icon:"cucina"},
+  basket:{title:"Basket Arena",   icon:"basket"},
+  pesca: {title:"Fishing Club",   icon:"pesca"},
+  calcio:{title:"Champions League",icon:"calcio"},
+  ippica:{title:"Scuderia",       icon:"ippica"},
+  nerd:  {title:"Tech Lab",        icon:"nerd"},
+  viaggi:{title:"Grand Tour",     icon:"viaggi"},
+  volley:{title:"Volley Court",   icon:"volley"},
+  gym:   {title:"Gymnastics",     icon:"gym"},
+  moto:  {title:"Moto Racing",    icon:"moto"},
+  music: {title:"Music Hall",     icon:"music"}
+};
+
+/* ============ FRASI PREMIUM ============ */
+const premiumPhrases = {
+  cucina:[
+    {n:"Casoncelli",t:"I casoncelli alla bergamasca sono ripieni di carne e amaretti.",l:"Bergamo",lat:45.69,lon:9.67},
+    {n:"Risotto",t:"Il vero risotto alla milanese richiede zafferano e midollo di bue.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Pizza",t:"La pizza Margherita fu creata a Napoli in onore della regina.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Torrone",t:"Il torrone classico si prepara con miele, mandorle e albumi.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Spiedo",t:"Lo spiedo bresciano cuoce lentamente con burro e salvia.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Tiramisù",t:"Il tiramisù è un dolce al cucchiaio con savoiardi e caffè.",l:"Treviso",lat:45.66,lon:12.24},
+    {n:"Pesto",t:"Il pesto ligure si prepara pestando il basilico nel mortaio.",l:"Genova",lat:44.40,lon:8.94},
+    {n:"Carbonara",t:"La pasta alla carbonara si fa con uova, guanciale e pecorino.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Tortellini",t:"I tortellini in brodo sono il piatto simbolo di Bologna.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Tinca",t:"La tinca al forno è il piatto tipico del lago d'Iseo.",l:"Clusane",lat:45.66,lon:10.00}
+  ],
+  basket:[
+    {n:"Olimpia",t:"Le scarpette rosse sono la squadra più titolata d'Italia.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Jordan",t:"Michael Jordan ha vinto sei titoli con i Chicago Bulls.",l:"Chicago",lat:41.87,lon:-87.62},
+    {n:"James",t:"Il record di punti in carriera appartiene a Lebron James.",l:"Los Angeles",lat:34.04,lon:-118.26},
+    {n:"Virtus",t:"Bologna è conosciuta come la capitale del basket italiano.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Tiro da tre",t:"Il tiro da tre punti vale di più perché è molto lontano.",l:"Varese",lat:45.82,lon:8.82},
+    {n:"Schiacciata",t:"La schiacciata è il gesto più spettacolare della pallacanestro.",l:"New York",lat:40.71,lon:-74.00},
+    {n:"Playmaker",t:"Il playmaker dirige il gioco e chiama gli schemi d'attacco.",l:"Sassari",lat:40.72,lon:8.56},
+    {n:"Difesa",t:"La difesa a zona protegge l'area dai passaggi avversari.",l:"Treviso",lat:45.66,lon:12.24},
+    {n:"Bryant",t:"La mentalità vincente di Kobe Bryant ispira molti atleti.",l:"Los Angeles",lat:34.04,lon:-118.26},
+    {n:"Eurolega",t:"L'Eurolega è la competizione più importante d'Europa.",l:"Barcellona",lat:41.38,lon:2.17}
+  ],
+  pesca:[
+    {n:"Il luccio",t:"Il luccio è un predatore vorace che vive nelle acque dolci.",l:"Lago di Garda",lat:45.60,lon:10.60},
+    {n:"La trota",t:"La trota fario risale i torrenti di montagna con forza.",l:"Adamello",lat:46.00,lon:10.50},
+    {n:"A mosca",t:"La pesca a mosca imita l'insetto che si posa sull'acqua.",l:"Trentino",lat:46.07,lon:11.12},
+    {n:"Siluro",t:"Il pesce siluro può raggiungere dimensioni davvero enormi.",l:"Fiume Po",lat:44.90,lon:12.00},
+    {n:"Carpfishing",t:"Il carpfishing prevede il rilascio del pesce dopo la cattura.",l:"Mantova",lat:45.15,lon:10.79},
+    {n:"La spigola",t:"La spigola caccia le sue prede vicino alla foce dei fiumi.",l:"Delta del Po",lat:44.85,lon:12.45},
+    {n:"Altura",t:"La pesca d'altura si pratica in mare aperto dalla barca.",l:"Mar Ligure",lat:44.40,lon:8.94},
+    {n:"Il persico",t:"Il pesce persico ha una carne molto pregiata e gustosa.",l:"Lago d'Iseo",lat:45.66,lon:10.05},
+    {n:"L'anguilla",t:"Le anguille migrano per migliaia di chilometri nel mare.",l:"Comacchio",lat:44.69,lon:12.18},
+    {n:"La tinca",t:"La tinca vive sui fondali fangosi dei laghi tranquilli.",l:"Clusane",lat:45.66,lon:10.00}
+  ],
+  calcio:[
+    {n:"Champions",t:"Alzare la coppa dei campioni è il sogno di ogni calciatore.",l:"San Siro",lat:45.47,lon:9.12},
+    {n:"Nazionale",t:"La maglia azzurra rappresenta l'Italia nel mondo del calcio.",l:"Coverciano",lat:43.77,lon:11.29},
+    {n:"Maradona",t:"Maradona ha regalato due scudetti alla città di Napoli.",l:"Napoli",lat:40.82,lon:14.19},
+    {n:"Atalanta",t:"L'Atalanta gioca un calcio offensivo e molto spettacolare.",l:"Bergamo",lat:45.70,lon:9.68},
+    {n:"Rigore",t:"Il calcio di rigore è il momento più teso della partita.",l:"Olimpico",lat:41.93,lon:12.45},
+    {n:"Portiere",t:"Il portiere difende la porta con tuffi e parate incredibili.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Fuorigioco",t:"Il fuorigioco impedisce agli attaccanti di stare fermi.",l:"Udine",lat:46.06,lon:13.23},
+    {n:"San Siro",t:"Lo stadio di San Siro è soprannominato la Scala del calcio.",l:"Milano",lat:45.47,lon:9.12},
+    {n:"Derby",t:"Il derby è la partita più attesa dai tifosi della città.",l:"Genova",lat:44.40,lon:8.94},
+    {n:"Baggio",t:"Il divin codino ha incantato tutti con le sue giocate.",l:"Brescia",lat:45.56,lon:10.23}
+  ],
+  ippica:[
+    {n:"Varenne",t:"Varenne è il trottatore italiano più famoso della storia.",l:"Ippodromo",lat:45.48,lon:9.12},
+    {n:"Il Palio",t:"Il Palio si corre due volte l'anno in Piazza del Campo.",l:"Siena",lat:43.31,lon:11.33},
+    {n:"Il salto",t:"Nel salto ostacoli non bisogna abbattere nessuna barriera.",l:"Piazza di Siena",lat:41.91,lon:12.48},
+    {n:"Galoppo",t:"Le corse al galoppo sono gare di velocità pura in pista.",l:"Capannelle",lat:41.83,lon:12.56},
+    {n:"Cavalli",t:"A Verona si tiene la fiera equestre piu importante.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Fantino",t:"Il fantino deve essere leggero per non rallentare il cavallo.",l:"Ascot",lat:51.41,lon:-0.67},
+    {n:"Purosangue",t:"Il purosangue inglese è la razza più veloce al mondo.",l:"Newmarket",lat:52.24,lon:0.40},
+    {n:"Il trotto",t:"Nel trotto il cavallo muove le gambe in diagonale.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Scuderia",t:"Nella scuderia i cavalli vengono curati e nutriti bene.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Dressage",t:"Il dressage è come una danza elegante tra cavallo e cavaliere.",l:"Arezzo",lat:43.46,lon:11.88}
+  ],
+  nerd:[
+    {n:"Super Mario",t:"Super Mario deve salvare la principessa nel castello.",l:"Kyoto",lat:34.98,lon:135.75},
+    {n:"Steve Jobs",t:"Steve Jobs ha fondato la Apple nel garage di casa sua.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"PlayStation",t:"La console di Sony ha rivoluzionato il mondo dei giochi.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Coding",t:"Scrivere codice aiuta a risolvere problemi complessi.",l:"Silicon Valley",lat:37.38,lon:-122.08},
+    {n:"Minecraft",t:"In Minecraft puoi costruire qualsiasi cosa con i cubi.",l:"Stoccolma",lat:59.32,lon:18.06},
+    {n:"Robot",t:"I computer imparano a svolgere compiti difficili da soli.",l:"San Francisco",lat:37.77,lon:-122.41},
+    {n:"Leonardo",t:"Leonardo fu il primo vero ingegnere della storia.",l:"Milano",lat:45.46,lon:9.17},
+    {n:"Olivetti",t:"L'azienda Olivetti ha portato il design tra i computer.",l:"Ivrea",lat:45.46,lon:7.87},
+    {n:"Visore",t:"Il visore permette di entrare in mondi digitali incredibili.",l:"Seattle",lat:47.60,lon:-122.33},
+    {n:"E-Sports",t:"I tornei di videogiochi riempiono interi stadi di fan.",l:"Seul",lat:37.56,lon:126.97}
+  ],
+  viaggi:[
+    {n:"Colosseo",t:"Il Colosseo è il simbolo eterno della grandezza di Roma.",l:"Roma",lat:41.89,lon:12.49},
+    {n:"Venezia",t:"I canali di Venezia si possono visitare solo in barca.",l:"Venezia",lat:45.43,lon:12.33},
+    {n:"Pisa",t:"La torre pendente attira turisti da tutto il mondo.",l:"Pisa",lat:43.72,lon:10.40},
+    {n:"Dolomiti",t:"Le Tre Cime di Lavaredo sono montagne spettacolari.",l:"Dolomiti",lat:46.61,lon:12.30},
+    {n:"Pompei",t:"Gli scavi di Pompei raccontano la vita nell'antica Roma.",l:"Pompei",lat:40.75,lon:14.48},
+    {n:"Costiera",t:"I paesi colorati a picco sul mare sono meravigliosi.",l:"Amalfi",lat:40.63,lon:14.60},
+    {n:"Firenze",t:"Il duomo di Firenze ha una cupola di mattoni immensa.",l:"Firenze",lat:43.76,lon:11.25},
+    {n:"Etna",t:"L'Etna in Sicilia è il vulcano attivo più alto d'Europa.",l:"Catania",lat:37.75,lon:14.99},
+    {n:"Lago di Como",t:"Le ville sul lago di Como sono famose per la bellezza.",l:"Bellagio",lat:45.98,lon:9.26},
+    {n:"Matera",t:"I sassi di Matera sono antiche case scavate nella roccia.",l:"Matera",lat:40.66,lon:16.60}
+  ],
+  volley:[
+    {n:"Nazionale",t:"Gli azzurri del volley hanno vinto molti titoli mondiali.",l:"Roma",lat:41.93,lon:12.46},
+    {n:"Bagher",t:"Il bagher è fondamentale per ricevere la battuta avversaria.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Il muro",t:"Il muro serve a bloccare l'attacco della squadra opposta.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Schiacciata",t:"Lo schiacciatore salta in alto per chiudere il punto.",l:"Perugia",lat:43.10,lon:12.36},
+    {n:"Il libero",t:"Il libero ha la maglia diversa e difende in seconda linea.",l:"Treviso",lat:45.88,lon:12.30},
+    {n:"Velasco",t:"Velasco ha guidato la generazione dei fenomeni alla vittoria.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Femminile",t:"Le ragazze della nazionale sono campionesse d'Europa.",l:"Conegliano",lat:45.88,lon:12.30},
+    {n:"Battuta",t:"La battuta al salto è potente e difficile da ricevere.",l:"Civitanova",lat:43.30,lon:13.72},
+    {n:"Palleggio",t:"Il regista della squadra decide a chi alzare la palla.",l:"Monza",lat:45.58,lon:9.27},
+    {n:"Tie break",t:"Il quinto set si gioca solo fino a quindici punti.",l:"Verona",lat:45.43,lon:10.98}
+  ],
+  gym:[
+    {n:"Chechi",t:"Jury Chechi ha dominato la specialità degli anelli.",l:"Prato",lat:43.88,lon:11.09},
+    {n:"Ferrari",t:"La ginnasta bresciana è un esempio di longevità sportiva.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"La trave",t:"L'esercizio alla trave richiede un equilibrio perfetto.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Biles",t:"Simone Biles esegue salti con difficoltà altissima.",l:"Houston",lat:29.76,lon:-95.36},
+    {n:"Corpo libero",t:"Il corpo libero unisce acrobatica e coreografia musicale.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Parallele",t:"Gli staggi asimmetrici richiedono forza nelle braccia.",l:"Roma",lat:41.93,lon:12.46},
+    {n:"Volteggio",t:"Dopo una rincorsa veloce l'atleta salta sulla tavola.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"L'oro",t:"Salire sul gradino più alto del podio è un'emozione unica.",l:"Parigi",lat:48.85,lon:2.35},
+    {n:"Allenamento",t:"La ginnastica richiede ore di allenamento ogni giorno.",l:"Como",lat:45.80,lon:9.08},
+    {n:"I giudici",t:"I giudici valutano l'esecuzione e le difficoltà dell'esercizio.",l:"Losanna",lat:46.51,lon:6.63}
+  ],
+  moto:[
+    {n:"Rossi",t:"Valentino Rossi ha vinto nove titoli mondiali in carriera.",l:"Tavullia",lat:43.89,lon:12.75},
+    {n:"Ducati",t:"La moto rossa di Borgo Panigale è velocissima in rettilineo.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Cairoli",t:"Cairoli è una leggenda del motocross con nove mondiali.",l:"Patti",lat:38.13,lon:14.96},
+    {n:"Mugello",t:"Il circuito del Mugello è uno dei più belli del mondo.",l:"Scarperia",lat:43.99,lon:11.37},
+    {n:"Motocross",t:"Le gare di motocross si corrono su piste di terra e fango.",l:"Maggiora",lat:45.70,lon:8.42},
+    {n:"Agostini",t:"Agostini detiene ancora il record di vittorie nel motomondiale.",l:"Bergamo",lat:45.69,lon:9.67},
+    {n:"La staccata",t:"I piloti frenano fortissimo prima di entrare in curva.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"MotoGP",t:"La classe regina delle moto offre gare spettacolari.",l:"Jerez",lat:36.70,lon:-6.03},
+    {n:"Meccanico",t:"I meccanici preparano la moto nel box prima della gara.",l:"Noale",lat:45.55,lon:12.07},
+    {n:"Impennata",t:"Festeggiare la vittoria con una impennata sulla ruota.",l:"Valencia",lat:39.48,lon:-0.37}
+  ],
+  music:[
+    {n:"Stradivari",t:"I violini di Antonio Stradivari hanno un suono inimitabile.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Pianoforte",t:"Il pianoforte ha ottantotto tasti bianchi e neri.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Chitarra",t:"La chitarra elettrica è lo strumento simbolo del rock.",l:"Seattle",lat:47.60,lon:-122.33},
+    {n:"Orchestra",t:"Il direttore d'orchestra guida i musicisti con la bacchetta.",l:"Vienna",lat:48.20,lon:16.37},
+    {n:"Verdi",t:"Verdi ha composto opere liriche famose in tutto il mondo.",l:"Busseto",lat:44.98,lon:10.04},
+    {n:"Sassofono",t:"Il sassofono è uno strumento a fiato molto usato nel jazz.",l:"New Orleans",lat:29.95,lon:-90.07},
+    {n:"Batteria",t:"Il batterista tiene il ritmo per tutta la band musicale.",l:"Londra",lat:51.50,lon:-0.12},
+    {n:"Mozart",t:"Mozart era un bambino prodigio che componeva già da piccolo.",l:"Salisburgo",lat:47.80,lon:13.05},
+    {n:"Mandolino",t:"Il mandolino è uno strumento tipico della tradizione napoletana.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Sanremo",t:"Il festival di Sanremo è la gara canora più famosa d'Italia.",l:"Sanremo",lat:43.81,lon:7.77}
+  ]
+};
+
+/* ============ GENERATORE SEMANTICO ============ */
+const semantics = {
+  cucina:[{s:["Il cuoco","Lo chef","Il pasticcere"],v:["impasta","decora","assaggia"],c:["la torta dolce.","il pane caldo.","la zuppa gustosa."],l:"Cucina",lat:45.46,lon:9.19}],
+  basket:[{s:["Il pivot","La guardia","L'ala grande"],v:["stoppa","passa","tira"],c:["sotto canestro.","da tre punti.","con precisione."],l:"Palazzetto",lat:44.49,lon:11.34}],
+  pesca: [{s:["Il pescatore","L'esperto"],v:["lancia","recupera","attende"],c:["l'amo nel lago.","la lenza lunga.","il pesce grande."],l:"Fiume Po",lat:44.90,lon:12.00}],
+  calcio:[{s:["L'arbitro","Il mediano","Il mister"],v:["fischia","corre","chiama"],c:["il fallo netto.","sulla fascia.","lo schema tattico."],l:"Stadio",lat:45.10,lon:7.64}],
+  ippica:[{s:["Il fantino","Lo stalliere"],v:["spazzola","guida","monta"],c:["il cavallo nero.","verso la pista.","con molta cura."],l:"Scuderia",lat:43.31,lon:11.33}],
+  nerd:  [{s:["Il programmatore","L'ingegnere"],v:["scrive","prova","aggiorna"],c:["il codice nuovo.","il robot veloce.","il gioco divertente."],l:"Laboratorio",lat:43.72,lon:10.40}],
+  viaggi:[{s:["Il viaggiatore","La guida"],v:["osserva","spiega","scopre"],c:["il monumento antico.","la storia locale.","una piazza nuova."],l:"Citta d'arte",lat:41.90,lon:12.49}],
+  volley:[{s:["Il centrale","L'allenatore"],v:["chiama","salta","difende"],c:["il tempo tecnico.","a muro alto.","la palla insidiosa."],l:"Palasport",lat:46.05,lon:11.11}],
+  gym:   [{s:["L'atleta","La ginnasta","Il campione"],v:["esegue","prova","studia"],c:["la capriola.","il salto teso.","la coreografia."],l:"Palestra",lat:45.54,lon:10.22}],
+  moto:  [{s:["Il meccanico","Il pilota"],v:["controlla","cambia","scalda"],c:["la gomma nuova.","la marcia veloce.","il motore potente."],l:"Box",lat:44.64,lon:10.92}],
+  music: [{s:["Il musicista","Il tenore"],v:["legge","canta","prova"],c:["lo spartito difficile.","l'opera lirica.","l'accordo maggiore."],l:"Teatro",lat:44.80,lon:10.32}]
+};
+
+/* ============ MODELLO TASTIERA (Magic Keyboard ISO italiana) ============ */
+// z = zona dito. Le lettere hanno id maiuscolo (= etichetta keycap).
+function L(id,z){return {id:id,mn:id,z:z};}
+const KB = [
+  {row:'f',keys:[
+    {id:'Esc',lbl:'esc',flex:1.6,al:'e'},
+    {id:'F1',icon:'sunLow'},{id:'F2',icon:'sunHigh'},{id:'F3',icon:'grid'},{id:'F4',icon:'search'},
+    {id:'F5',icon:'mic'},{id:'F6',icon:'moon'},{id:'F7',icon:'prev'},{id:'F8',icon:'play'},
+    {id:'F9',icon:'next'},{id:'F10',icon:'volMute'},{id:'F11',icon:'volDown'},{id:'F12',icon:'volUp'},
+    {id:'Power',glyph:'⏻',flex:1}
+  ]},
+  {row:'',keys:[
+    {id:'1',mn:'1',sub:'!',z:'L5'},{id:'2',mn:'2',sub:'"',z:'L4'},{id:'3',mn:'3',sub:'£',z:'L3'},
+    {id:'4',mn:'4',sub:'$',z:'L2'},{id:'5',mn:'5',sub:'%',z:'L2'},{id:'6',mn:'6',sub:'&',z:'R2'},
+    {id:'7',mn:'7',sub:'/',z:'R2'},{id:'8',mn:'8',sub:'(',z:'R3'},{id:'9',mn:'9',sub:')',z:'R4'},
+    {id:'0',mn:'0',sub:'=',z:'R5'},{id:'Apostrophe',mn:"'",sub:'?',z:'R5'},{id:'Igrave',mn:'ì',sub:'^',z:'R5'},
+    {id:'Back',glyph:'⌫',flex:1.6,al:'e',z:'R5'}
+  ]},
+  {row:'',keys:[
+    {id:'Tab',glyph:'⇥',word:'tab',flex:1.6,al:'s',z:'L5'},
+    L('Q','L5'),L('W','L4'),L('E','L3'),L('R','L2'),L('T','L2'),L('Y','R2'),L('U','R2'),L('I','R3'),L('O','R4'),L('P','R5'),
+    {id:'Egrave',mn:'è',sub:'é',z:'R5'},{id:'Plus',mn:'+',sub:'*',z:'R5'}
+  ]},
+  {row:'',keys:[
+    {id:'Caps',glyph:'⇪',word:'maiusc',flex:1.9,al:'s',z:'L5'},
+    L('A','L5'),L('S','L4'),L('D','L3'),L('F','L2'),L('G','L2'),L('H','R2'),L('J','R2'),L('K','R3'),L('L','R4'),
+    {id:'Ograve',mn:'ò',sub:'ç',z:'R5'},{id:'Agrave',mn:'à',sub:'°',z:'R5'},{id:'Ugrave',mn:'ù',sub:'§',z:'R5'},
+    {id:'Enter',glyph:'↵',flex:1.6,al:'e',z:'R5'}
+  ]},
+  {row:'',keys:[
+    {id:'ShiftL',glyph:'⇧',word:'maiusc',flex:1.5,al:'s',z:'L5'},
+    {id:'Less',mn:'<',sub:'>',z:'L5'},
+    L('Z','L5'),L('X','L4'),L('C','L3'),L('V','L2'),L('B','L2'),L('N','R2'),L('M','R2'),
+    {id:'Comma',mn:',',sub:';',z:'R3'},{id:'Dot',mn:'.',sub:':',z:'R4'},{id:'Minus',mn:'-',sub:'_',z:'R5'},
+    {id:'ShiftR',glyph:'⇧',word:'maiusc',flex:2.4,al:'e',z:'R5'}
+  ]},
+  {row:'',keys:[
+    {id:'Fn',glyph:'fn',tiny:true,flex:1},
+    {id:'Ctrl',glyph:'⌃',word:'control',flex:1.1},
+    {id:'Opt',glyph:'⌥',word:'alt',flex:1.1},
+    {id:'Cmd',glyph:'⌘',word:'cmd',flex:1.4},
+    {id:'Space',z:'Th',flex:6},
+    {id:'Cmd',glyph:'⌘',word:'cmd',flex:1.4},
+    {id:'Opt',glyph:'⌥',word:'alt',flex:1.1},
+    {arrows:true}
+  ]}
+];
+
+// id -> zona (fonte unica per il dito)
+const ID_ZONE = {};
+KB.forEach(r=>r.keys.forEach(k=>{ if(k.id && k.z) ID_ZONE[k.id]=k.z; }));
+
+// char -> {key, shift}
+const CHAR_KEY = {};
+"abcdefghijklmnopqrstuvwxyz".split('').forEach(c=>{ CHAR_KEY[c]={key:c.toUpperCase()}; CHAR_KEY[c.toUpperCase()]={key:c.toUpperCase(),shift:true}; });
+Object.assign(CHAR_KEY,{
+  'à':{key:'Agrave'},'è':{key:'Egrave'},'é':{key:'Egrave',shift:true},
+  'ì':{key:'Igrave'},'ò':{key:'Ograve'},'ù':{key:'Ugrave'},
+  'À':{key:'Agrave',shift:true},'È':{key:'Egrave',shift:true},'É':{key:'Egrave',shift:true},
+  'Ì':{key:'Igrave',shift:true},'Ò':{key:'Ograve',shift:true},'Ù':{key:'Ugrave',shift:true},
+  '.':{key:'Dot'},',':{key:'Comma'},"'":{key:'Apostrophe'},'-':{key:'Minus'},' ':{key:'Space'},
+  '0':{key:'0'},'1':{key:'1'},'2':{key:'2'},'3':{key:'3'},'4':{key:'4'},
+  '5':{key:'5'},'6':{key:'6'},'7':{key:'7'},'8':{key:'8'},'9':{key:'9'}
+});
+function charInfo(ch){
+  const m = CHAR_KEY[ch]; if(!m) return null;
+  if(m.key==='Space') return {key:'Space',keys:['Space'],fingers:['L1','R1']};
+  const keys=[m.key], fingers=[], z=ID_ZONE[m.key];
+  if(z) fingers.push(z);
+  if(m.shift){
+    if(z && z.charAt(0)==='L'){ keys.push('ShiftR'); fingers.push('R5'); }
+    else { keys.push('ShiftL'); fingers.push('L5'); }
+  }
+  return {key:m.key,keys:keys,fingers:fingers};
+}
+
+/* ============ RENDER TASTIERA ============ */
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function buildKeyboard(id,opts){
+  opts = opts||{};
+  let html='';
+  KB.forEach(r=>{
+    html += '<div class="krow '+(r.row==='f'?'f':'')+'">';
+    r.keys.forEach(k=>{
+      if(k.arrows){ html += arrowsHTML(opts.interactive); return; }
+      let inner='';
+      if(k.icon) inner='<span class="fic">'+svg(k.icon,'fic')+'</span>';
+      else if(k.glyph!==undefined) inner='<span class="glyph'+(k.tiny?' tiny':'')+'">'+esc(k.glyph)+'</span>';
+      else if(k.mn!==undefined) inner=(k.sub!==undefined?'<span class="sub">'+esc(k.sub)+'</span>':'')+'<span class="mn">'+esc(k.mn)+'</span>';
+      else if(k.lbl!==undefined) inner='<span class="lbl">'+esc(k.lbl)+'</span>';
+      if(k.word) inner+='<span class="word">'+esc(k.word)+'</span>';
+      let cls='key';
+      if(k.al==='s') cls+=' al-s'; else if(k.al==='e') cls+=' al-e';
+      if(opts.zones && k.z) cls+=' z-'+k.z;
+      const click = opts.interactive ? ' onclick="ninjaPress(\''+k.id+'\')"' : '';
+      html += '<div class="'+cls+'" style="flex:'+(k.flex||1)+'" data-k="'+esc(k.id)+'"'+click+'>'+inner+'</div>';
+    });
+    html += '</div>';
+  });
+  document.getElementById(id).innerHTML = html;
+}
+function arrowsHTML(interactive){
+  const c=function(k){return interactive?' onclick="ninjaPress(\''+k+'\')"':'';};
+  return '<div class="arrows">'
+    +'<div class="arr-r half"><div class="arr blank"></div>'
+    +'<div class="arr" data-k="Up"'+c('Up')+'>▲</div><div class="arr blank"></div></div>'
+    +'<div class="arr-r"><div class="arr" data-k="Left"'+c('Left')+'>◀</div>'
+    +'<div class="arr" data-k="Down"'+c('Down')+'>▼</div>'
+    +'<div class="arr" data-k="Right"'+c('Right')+'>▶</div></div></div>';
+}
+
+/* ============ STATO ============ */
+let st = {user:"",cls:"",topic:"",score:0,idx:0,typed:"",caps:false,isSec:false,fullText:"",done:0,db:[]};
+let nj = {lvl:0,qIdx:0,input:[],currentQ:null};
+
+const ninjaLevels = [
+  {name:"1",qs:[{n:"Copia",k:["Cmd","C"]},{n:"Incolla",k:["Cmd","V"]},{n:"Taglia",k:["Cmd","X"]},{n:"Salva",k:["Cmd","S"]}]},
+  {name:"2",qs:[{n:"Annulla",k:["Cmd","Z"]},{n:"Seleziona tutto",k:["Cmd","A"]},{n:"Cerca",k:["Cmd","F"]},{n:"Stampa",k:["Cmd","P"]}]},
+  {name:"3",qs:[{n:"Screenshot",k:["ShiftL","Cmd","4"]},{n:"Spotlight",k:["Cmd","Space"]},{n:"Cambia app",k:["Cmd","Tab"]}]}
+];
+
+/* ============ DATABASE FRASI ============ */
+function generateDB(topic){
+  const pr = premiumPhrases[topic]||premiumPhrases.cucina;
+  const sg = semantics[topic]||semantics.cucina;
+  const db = pr.slice();
+  for(let i=db.length;i<200;i++){
+    const g = sg[Math.floor(Math.random()*sg.length)];
+    const s = g.s[Math.floor(Math.random()*g.s.length)];
+    const v = g.v[Math.floor(Math.random()*g.v.length)];
+    const c = g.c[Math.floor(Math.random()*g.c.length)];
+    db.push({n:"Allenamento "+(i+1),t:s+" "+v+" "+c,l:g.l,lat:g.lat,lon:g.lon});
+  }
+  return db;
+}
+
+/* ============ AVVIO ============ */
+function initIcons(){
+  document.getElementById('loginBrand').innerHTML = brandHTML();
+  document.getElementById('appBrand').innerHTML = brandHTML();
+  document.getElementById('musicIcon').innerHTML = svg('soundOff');
+  document.getElementById('exitIcon').innerHTML = svg('exit');
+  document.getElementById('ninjaIcon').innerHTML = svg('trophy');
+  document.getElementById('backIcon').innerHTML = svg('back');
+  // legenda dita
+  const legend = [['L5','mignolo'],['L4','anulare'],['L3','medio'],['L2','indice'],
+                  ['R2','indice'],['R3','medio'],['R4','anulare'],['R5','mignolo']];
+  document.getElementById('legend').innerHTML =
+    '<span><i style="background:var(--zTh)"></i>pollici · spazio</span>'+
+    legend.map(function(z){return '<span><i style="background:var(--z'+z[0]+')"></i>'+z[1]+'</span>';}).join('');
+}
+
+function avviaSuite(){
+  st.user = document.getElementById('nameInput').value.trim();
+  st.cls = document.getElementById('classSelect').value;
+  st.topic = document.getElementById('topicSelect').value;
+  if(!st.user || !st.cls || !st.topic){ shakeLogin(); return; }
+
+  st.caps = st.cls.indexOf('P')>=0 && (st.cls.charAt(0)==='1' || st.cls.charAt(0)==='2');
+  st.isSec = st.cls.indexOf('S')>=0;
+  st.db = generateDB(st.topic);
+  st.idx=0; st.score=0; st.done=0;
+
+  const conf = topicsConfig[st.topic];
+  document.getElementById('topicTitle').textContent = conf.title;
+  document.getElementById('scoreNum').textContent = "0";
+  document.getElementById('rewards').innerHTML = "";
+  document.getElementById('bgMusic').src = playlist[0];
+
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appContainer').style.display = 'grid';
+
+  buildKeyboard('kbdChef',{zones:true});
+  buildKeyboard('kbdNinja',{interactive:true});
+  caricaEsercizio();
+  window.addEventListener('keydown', handleGlobalKey);
+}
+function shakeLogin(){
+  const m=document.querySelector('.login-modal');
+  m.style.animation='shake .4s'; setTimeout(function(){m.style.animation='';},420);
+}
+function esciLogin(){ location.reload(); }
+
+/* ============ ESERCIZIO ============ */
+function caricaEsercizio(){
+  const r = st.db[st.idx % st.db.length];
+  let frase = r.t;
+  if(st.isSec){ if(st.idx>=10) frase = frase.replace(/\.$/,", perché è importante."); }
+  else if(st.caps){ frase = frase.toUpperCase(); }
+
+  st.fullText = frase;
+  st.typed = "";
+
+  const conf = topicsConfig[st.topic];
+  document.getElementById('dishName').innerHTML = svg(conf.icon,'ic')+'<span>'+esc(r.n)+'</span>';
+  document.getElementById('loc').innerHTML = svg('pin')+'<span>'+esc(r.l)+'</span>';
+  document.getElementById('mapFrame').src =
+    'https://maps.google.com/maps?q='+r.lat+','+r.lon+'&t=h&z=9&ie=UTF8&iwloc=B&output=embed';
+
+  aggiornaDisplay();
+  aggiornaVisivo();
+}
+
+function aggiornaDisplay(){
+  const done = esc(st.fullText.substring(0, st.typed.length));
+  const nextCh = st.fullText.charAt(st.typed.length);
+  const todo = esc(st.fullText.substring(st.typed.length+1));
+  const nextHTML = nextCh ? '<span class="text-next">'+esc(nextCh===' '?' ':nextCh)+'</span>' : '';
+  document.getElementById('phraseText').innerHTML =
+    '<span class="text-done">'+done+'</span><span class="text-cursor"></span>'+nextHTML+'<span class="text-todo">'+todo+'</span>';
+}
+
+function aggiornaVisivo(){
+  document.querySelectorAll('.finger').forEach(function(f){f.classList.remove('active');});
+  document.querySelectorAll('#kbdChef .key').forEach(function(k){k.classList.remove('hint');});
+  const next = st.fullText.charAt(st.typed.length);
+  if(!next) return;
+  const info = charInfo(next);
+  if(!info) return;
+  info.fingers.forEach(function(f){ const el=document.getElementById(f); if(el) el.classList.add('active'); });
+  info.keys.forEach(function(kid){
+    const el=document.querySelector('#kbdChef .key[data-k="'+kid+'"]'); if(el) el.classList.add('hint');
+  });
+}
+
+function handleGlobalKey(e){
+  if(document.getElementById('appContainer').style.display==='none') return;
+  if(document.getElementById('ninjaApp').style.display==='flex') return;
+  if(e.key==='Shift'||e.key==='CapsLock'||e.key==='Control'||e.key==='Alt'||e.key==='Meta') return;
+  if(e.key===' ') e.preventDefault();
+
+  const char = st.fullText.charAt(st.typed.length);
+  if(!char) return;
+  const match = e.key===char || (st.caps && e.key.length===1 && e.key.toUpperCase()===char);
+  if(!match) return;
+
+  st.typed += char;
+  const info = charInfo(char);
+  if(info){ const k=document.querySelector('#kbdChef .key[data-k="'+info.key+'"]');
+    if(k){ k.classList.add('press'); setTimeout(function(){k.classList.remove('press');},110); } }
+
+  aggiornaDisplay();
+  if(st.typed.length===st.fullText.length){
+    st.score += st.fullText.length*10;
+    document.getElementById('scoreNum').textContent = st.score;
+    addReward();
+    st.idx++;
+    setTimeout(caricaEsercizio, 620);
+  } else {
+    aggiornaVisivo();
+  }
+}
+
+function addReward(){
+  st.done++;
+  const el=document.createElement('div'); el.className='reward'; el.innerHTML=svg('check');
+  document.getElementById('rewards').appendChild(el);
+}
+
+/* ============ MUSICA ============ */
+function toggleMusic(){
+  const m=document.getElementById('bgMusic');
+  if(m.paused){ m.play().catch(function(){}); isPlaying=true;
+    document.getElementById('musicIcon').innerHTML=svg('soundOn');
+    document.getElementById('musicLbl').textContent='In riproduzione';
+    document.getElementById('musicBtn').classList.remove('muted');
+  } else { m.pause(); isPlaying=false;
+    document.getElementById('musicIcon').innerHTML=svg('soundOff');
+    document.getElementById('musicLbl').textContent='Musica';
+    document.getElementById('musicBtn').classList.add('muted');
+  }
+  document.getElementById('musicBtn').blur();
+}
+function cambiaTraccia(sel){
+  sel.blur();
+  const m=document.getElementById('bgMusic'); m.src=playlist[sel.value];
+  if(isPlaying) m.play().catch(function(){});
+}
+
+/* ============ NINJA ============ */
+const GLYPH = {Cmd:'⌘',ShiftL:'⇧',ShiftR:'⇧',Opt:'⌥',Ctrl:'⌃',Space:'spazio',Tab:'⇥ tab'};
+function goToNinja(){
+  document.getElementById('appContainer').style.display='none';
+  document.getElementById('ninjaApp').style.display='flex';
+  nj.lvl=0; loadNinjaLvl(0);
+}
+function backToMain(){
+  document.getElementById('ninjaApp').style.display='none';
+  document.getElementById('appContainer').style.display='grid';
+}
+function loadNinjaLvl(idx){
+  if(idx>=ninjaLevels.length){ document.getElementById('ninjaQuestion').textContent="Completato!"; document.getElementById('ninjaCombo').innerHTML=''; return; }
+  nj.lvl=idx; nj.qIdx=0;
+  document.getElementById('ninjaLevel').textContent=ninjaLevels[idx].name;
+  askNinja();
+}
+function askNinja(){
+  const lvl=ninjaLevels[nj.lvl];
+  if(nj.qIdx>=lvl.qs.length){ loadNinjaLvl(nj.lvl+1); return; }
+  nj.currentQ=lvl.qs[nj.qIdx]; nj.input=[];
+  const q=document.getElementById('ninjaQuestion'); q.className='ninja-q'; q.textContent=nj.currentQ.n;
+  document.querySelectorAll('#kbdNinja .key').forEach(function(k){k.classList.remove('armed');});
+  renderCombo();
+}
+function ninjaPress(id){
+  const i=nj.input.indexOf(id);
+  if(i>=0) nj.input.splice(i,1); else nj.input.push(id);
+  document.querySelectorAll('#kbdNinja [data-k]').forEach(function(el){
+    el.classList.toggle('armed', nj.input.indexOf(el.dataset.k)>=0);
+  });
+  renderCombo();
+  if(nj.input.length===nj.currentQ.k.length){
+    const ok = nj.currentQ.k.every(function(k){return nj.input.indexOf(k)>=0;});
+    const q=document.getElementById('ninjaQuestion');
+    if(ok){ q.className='ninja-q ok'; q.textContent='Corretto!';
+      setTimeout(function(){nj.qIdx++; askNinja();},850);
+    } else { q.className='ninja-q warn';
+      setTimeout(function(){ nj.input=[]; askNinja(); },850);
+    }
+  }
+}
+function renderCombo(){
+  const div=document.getElementById('ninjaCombo');
+  if(!nj.currentQ){ div.innerHTML=''; return; }
+  if(nj.input.length===0){ div.innerHTML='<span class="combo-ph">Componi la scorciatoia…</span>'; return; }
+  div.innerHTML = nj.input.map(function(k,i){
+    const lbl = GLYPH[k] ? GLYPH[k]+' '+(k.indexOf('Shift')===0?'':k==='Space'||k==='Tab'?'':k) : k;
+    const clean = GLYPH[k] ? (k==='Cmd'?'⌘ cmd':k.indexOf('Shift')===0?'⇧ maiusc':k==='Opt'?'⌥ alt':k==='Ctrl'?'⌃ ctrl':GLYPH[k]) : k;
+    return (i>0?'<span class="combo-plus">+</span>':'')+'<span class="combo-key">'+esc(clean)+'</span>';
+  }).join('');
+}
+
+/* ============ INIT ============ */
+initIcons();
+</script>
+</body>
+</html>
