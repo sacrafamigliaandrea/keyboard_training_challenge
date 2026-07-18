@@ -107,6 +107,13 @@ select{appearance:none;-webkit-appearance:none;
   border-radius:2px;animation:blink 1.05s steps(1) infinite;margin:0 1px}
 @keyframes blink{50%{opacity:0}}
 
+/* Glossario (scaffolding per i termini tecnici della frase) */
+.glossary{width:100%;max-width:900px;display:flex;align-items:flex-start;gap:10px;
+  background:var(--blueL);border:1px solid rgba(0,113,227,.22);border-radius:14px;
+  padding:10px 16px;font-size:.95rem;line-height:1.45;color:var(--ink);margin-top:-4px}
+.glossary svg{width:18px;height:18px;color:var(--blue);flex:0 0 auto;margin-top:2px}
+.glossary .glb{font-weight:700;color:var(--blue);letter-spacing:.4px;margin-right:6px}
+
 /* Mani (SVG dorso, dita evidenziabili) */
 .hands{display:flex;justify-content:center;gap:52px;align-items:flex-end;height:108px}
 .hand-svg{height:108px;width:auto;filter:drop-shadow(0 6px 12px rgba(0,0,0,.10))}
@@ -239,7 +246,6 @@ select{appearance:none;-webkit-appearance:none;
   <div class="login-modal">
     <div class="login-brand" id="loginBrand"></div>
     <div class="login-title">Keyboard Training Challenge</div>
-    <div class="login-sub">Laboratorio di Informatica · Esercizi di dattilografia del prof. Andrea Cerioli</div>
 
     <label class="field-lbl" for="nameInput">Il tuo nickname</label>
     <input type="text" id="nameInput" placeholder="Inventa un nickname…" autocomplete="off" maxlength="14">
@@ -309,6 +315,7 @@ select{appearance:none;-webkit-appearance:none;
 
     <div class="stage">
       <div class="phrase-container"><div id="phraseText" class="text-wrapper"></div></div>
+      <div class="glossary hidden" id="glossary"></div>
 
       <div class="hands" id="handsWrap"></div>
 
@@ -378,6 +385,7 @@ const ICONS = {
   exit:'<path d="M10 4H5v16h5"/><path d="M15 8l4 4-4 4M19 12H9"/>',
   pin:'<path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11z"/><circle cx="12" cy="10" r="2.4"/>',
   trophy:'<path d="M7 4h10v4a5 5 0 0 1-10 0V4z"/><path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3M9 15h6M10 19h4M12 15v4"/>',
+  book:'<path d="M4 6a2 2 0 0 1 2-2h5v16H6a2 2 0 0 0-2 2V6z"/><path d="M20 6a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2V6z"/>',
   medal:'<circle cx="12" cy="9.5" r="5.5"/><path d="M12 7.4l.8 1.6 1.8.3-1.3 1.3.3 1.8-1.6-.8-1.6.8.3-1.8-1.3-1.3 1.8-.3z"/><path d="M8.8 14.2L7.2 21l4.8-2.5L16.8 21l-1.6-6.8"/>',
   check:'<path d="M4 12l5 5L20 6"/>',
   back:'<path d="M15 6l-6 6 6 6"/>',
@@ -585,155 +593,462 @@ const topicsConfig = {
   music: {title:"Music Hall",     icon:"music"}
 };
 
-/* ============ FRASI PREMIUM ============ */
-const premiumPhrases = {
+/* ============ FRASI BASE (classi 1-2 Primaria, stampato maiuscolo) ============
+   Frasi corte (25-45 caratteri), lessico semplice, fatti veri. */
+const premiumBase = {
   cucina:[
-    {n:"Casoncelli",t:"I casoncelli alla bergamasca sono ripieni di carne e amaretti.",l:"Bergamo",lat:45.69,lon:9.67},
-    {n:"Risotto",t:"Il vero risotto alla milanese richiede zafferano e midollo di bue.",l:"Milano",lat:45.46,lon:9.19},
-    {n:"Pizza",t:"La pizza Margherita fu creata a Napoli in onore della regina.",l:"Napoli",lat:40.85,lon:14.26},
-    {n:"Torrone",t:"Il torrone classico si prepara con miele, mandorle e albumi.",l:"Cremona",lat:45.13,lon:10.02},
-    {n:"Spiedo",t:"Lo spiedo bresciano cuoce lentamente con burro e salvia.",l:"Brescia",lat:45.54,lon:10.22},
-    {n:"Tiramisù",t:"Il tiramisù è un dolce al cucchiaio con savoiardi e caffè.",l:"Treviso",lat:45.66,lon:12.24},
-    {n:"Pesto",t:"Il pesto ligure si prepara pestando il basilico nel mortaio.",l:"Genova",lat:44.40,lon:8.94},
-    {n:"Carbonara",t:"La pasta alla carbonara si fa con uova, guanciale e pecorino.",l:"Roma",lat:41.90,lon:12.49},
-    {n:"Tortellini",t:"I tortellini in brodo sono il piatto simbolo di Bologna.",l:"Bologna",lat:44.49,lon:11.34},
-    {n:"Tinca",t:"La tinca al forno è il piatto tipico del lago d'Iseo.",l:"Clusane",lat:45.66,lon:10.00}
+    {n:"Pizza",t:"La pizza nasce a Napoli.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Pane",t:"Il pane si fa con acqua e farina.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Pasta",t:"La pasta si butta quando l'acqua bolle.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Torta",t:"La torta cuoce nel forno caldo.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Sugo",t:"Il cuoco assaggia sempre il sugo.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Lasagne",t:"Le lasagne si fanno a strati.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Parmigiano",t:"Il parmigiano si grattugia sulla pasta.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Pesto",t:"Il pesto è verde come il basilico.",l:"Genova",lat:44.40,lon:8.94},
+    {n:"Frutta",t:"La frutta fa bene a tutti.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Miele",t:"Il miele lo fanno le api.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Gelato",t:"Il gelato si scioglie al sole.",l:"Firenze",lat:43.76,lon:11.25},
+    {n:"A tavola",t:"A tavola si sta insieme felici.",l:"Orzinuovi",lat:45.40,lon:9.92}
   ],
   basket:[
-    {n:"Olimpia",t:"Le scarpette rosse sono la squadra più titolata d'Italia.",l:"Milano",lat:45.48,lon:9.12},
-    {n:"Jordan",t:"Michael Jordan ha vinto sei titoli con i Chicago Bulls.",l:"Chicago",lat:41.87,lon:-87.62},
-    {n:"James",t:"Il record di punti in carriera appartiene a Lebron James.",l:"Los Angeles",lat:34.04,lon:-118.26},
-    {n:"Virtus",t:"Bologna è conosciuta come la capitale del basket italiano.",l:"Bologna",lat:44.49,lon:11.34},
-    {n:"Tiro da tre",t:"Il tiro da tre punti vale di più perché è molto lontano.",l:"Varese",lat:45.82,lon:8.82},
-    {n:"Schiacciata",t:"La schiacciata è il gesto più spettacolare della pallacanestro.",l:"New York",lat:40.71,lon:-74.00},
-    {n:"Playmaker",t:"Il playmaker dirige il gioco e chiama gli schemi d'attacco.",l:"Sassari",lat:40.72,lon:8.56},
-    {n:"Difesa",t:"La difesa a zona protegge l'area dai passaggi avversari.",l:"Treviso",lat:45.66,lon:12.24},
-    {n:"Bryant",t:"La mentalità vincente di Kobe Bryant ispira molti atleti.",l:"Los Angeles",lat:34.04,lon:-118.26},
-    {n:"Eurolega",t:"L'Eurolega è la competizione più importante d'Europa.",l:"Barcellona",lat:41.38,lon:2.17}
+    {n:"Palla",t:"La palla rimbalza sul campo.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Canestro",t:"Il canestro è alto sopra di me.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Due punti",t:"Chi fa canestro fa due punti.",l:"Varese",lat:45.82,lon:8.82},
+    {n:"Tre punti",t:"Il tiro da lontano vale tre punti.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Palleggio",t:"Si palleggia con una mano sola.",l:"Torino",lat:45.07,lon:7.68},
+    {n:"Passaggio",t:"Il passaggio va dato al compagno.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Inizio",t:"La partita inizia a metà campo.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Difesa",t:"In difesa si aprono le braccia.",l:"Treviso",lat:45.66,lon:12.24},
+    {n:"Spicchi",t:"La palla da basket è a spicchi.",l:"Trieste",lat:45.65,lon:13.77},
+    {n:"Minibasket",t:"Nel cortile giochiamo a minibasket.",g:"Il minibasket è il basket dei bambini, con canestri più bassi.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Capitano",t:"Il capitano incoraggia tutti.",l:"Sassari",lat:40.72,lon:8.56},
+    {n:"Saluto",t:"Dopo la partita ci si dà la mano.",l:"Pesaro",lat:43.91,lon:12.91}
   ],
   pesca:[
-    {n:"Il luccio",t:"Il luccio è un predatore vorace che vive nelle acque dolci.",l:"Lago di Garda",lat:45.60,lon:10.60},
-    {n:"La trota",t:"La trota fario risale i torrenti di montagna con forza.",l:"Adamello",lat:46.00,lon:10.50},
-    {n:"A mosca",t:"La pesca a mosca imita l'insetto che si posa sull'acqua.",l:"Trentino",lat:46.07,lon:11.12},
-    {n:"Siluro",t:"Il pesce siluro può raggiungere dimensioni davvero enormi.",l:"Fiume Po",lat:44.90,lon:12.00},
-    {n:"Carpfishing",t:"Il carpfishing prevede il rilascio del pesce dopo la cattura.",l:"Mantova",lat:45.15,lon:10.79},
-    {n:"La spigola",t:"La spigola caccia le sue prede vicino alla foce dei fiumi.",l:"Delta del Po",lat:44.85,lon:12.45},
-    {n:"Altura",t:"La pesca d'altura si pratica in mare aperto dalla barca.",l:"Mar Ligure",lat:44.40,lon:8.94},
-    {n:"Il persico",t:"Il pesce persico ha una carne molto pregiata e gustosa.",l:"Lago d'Iseo",lat:45.66,lon:10.05},
-    {n:"L'anguilla",t:"Le anguille migrano per migliaia di chilometri nel mare.",l:"Comacchio",lat:44.69,lon:12.18},
-    {n:"La tinca",t:"La tinca vive sui fondali fangosi dei laghi tranquilli.",l:"Clusane",lat:45.66,lon:10.00}
+    {n:"Il pesce",t:"Il pesce nuota nel lago.",l:"Lago d'Iseo",lat:45.66,lon:10.05},
+    {n:"La canna",t:"La canna da pesca è lunga.",l:"Clusane",lat:45.66,lon:10.00},
+    {n:"Silenzio",t:"Il pescatore aspetta in silenzio.",l:"Fiume Po",lat:44.90,lon:12.00},
+    {n:"Trota",t:"La trota ama l'acqua fredda.",l:"Trentino",lat:46.07,lon:11.12},
+    {n:"Luccio",t:"Il luccio ha tanti denti.",l:"Mantova",lat:45.15,lon:10.79},
+    {n:"L'amo",t:"L'amo si attacca alla lenza.",l:"Lago di Garda",lat:45.60,lon:10.60},
+    {n:"La rana",t:"La rana salta sulla riva.",l:"Fiume Oglio",lat:45.40,lon:9.92},
+    {n:"Oglio",t:"Il fiume Oglio passa qui vicino.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"La barca",t:"La barca scivola piano sull'acqua.",l:"Como",lat:45.80,lon:9.08},
+    {n:"Martin",t:"Il martin pescatore è azzurro.",l:"Delta del Po",lat:44.85,lon:12.45},
+    {n:"Il polpo",t:"Il polpo vive in mezzo agli scogli.",l:"Napoli",lat:40.79,lon:14.20},
+    {n:"Libero",t:"Dopo la foto il pesce torna libero.",l:"Lago di Garda",lat:45.60,lon:10.60}
   ],
   calcio:[
-    {n:"Champions",t:"Alzare la coppa dei campioni è il sogno di ogni calciatore.",l:"San Siro",lat:45.47,lon:9.12},
-    {n:"Nazionale",t:"La maglia azzurra rappresenta l'Italia nel mondo del calcio.",l:"Coverciano",lat:43.77,lon:11.29},
-    {n:"Maradona",t:"Maradona ha regalato due scudetti alla città di Napoli.",l:"Napoli",lat:40.82,lon:14.19},
-    {n:"Atalanta",t:"L'Atalanta gioca un calcio offensivo e molto spettacolare.",l:"Bergamo",lat:45.70,lon:9.68},
-    {n:"Rigore",t:"Il calcio di rigore è il momento più teso della partita.",l:"Olimpico",lat:41.93,lon:12.45},
-    {n:"Portiere",t:"Il portiere difende la porta con tuffi e parate incredibili.",l:"Torino",lat:45.10,lon:7.64},
-    {n:"Fuorigioco",t:"Il fuorigioco impedisce agli attaccanti di stare fermi.",l:"Udine",lat:46.06,lon:13.23},
-    {n:"San Siro",t:"Lo stadio di San Siro è soprannominato la Scala del calcio.",l:"Milano",lat:45.47,lon:9.12},
-    {n:"Derby",t:"Il derby è la partita più attesa dai tifosi della città.",l:"Genova",lat:44.40,lon:8.94},
-    {n:"Baggio",t:"Il divin codino ha incantato tutti con le sue giocate.",l:"Brescia",lat:45.56,lon:10.23}
+    {n:"Pallone",t:"Il pallone rotola sul prato.",l:"Bergamo",lat:45.70,lon:9.68},
+    {n:"Gol",t:"Il gol si fa nella porta.",l:"Milano",lat:45.47,lon:9.12},
+    {n:"Portiere",t:"Il portiere para con le mani.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Arbitro",t:"L'arbitro fischia l'inizio.",l:"Roma",lat:41.93,lon:12.45},
+    {n:"Azzurri",t:"La maglia azzurra è dell'Italia.",l:"Coverciano",lat:43.77,lon:11.29},
+    {n:"Rigore",t:"Il rigore si tira dal dischetto.",l:"Napoli",lat:40.82,lon:14.19},
+    {n:"In undici",t:"In campo si gioca in undici.",l:"Udine",lat:46.06,lon:13.23},
+    {n:"Fascia",t:"Il capitano porta la fascia.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Esultanza",t:"Si esulta insieme dopo il gol.",l:"Bergamo",lat:45.70,lon:9.68},
+    {n:"Fallo",t:"Dopo un fallo si chiede scusa.",l:"Genova",lat:44.40,lon:8.94},
+    {n:"Oratorio",t:"All'oratorio si gioca felici.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"La coppa",t:"La coppa brilla al sole.",l:"Madrid",lat:40.42,lon:-3.70}
   ],
   ippica:[
-    {n:"Varenne",t:"Varenne è il trottatore italiano più famoso della storia.",l:"Ippodromo",lat:45.48,lon:9.12},
-    {n:"Il Palio",t:"Il Palio si corre due volte l'anno in Piazza del Campo.",l:"Siena",lat:43.31,lon:11.33},
-    {n:"Il salto",t:"Nel salto ostacoli non bisogna abbattere nessuna barriera.",l:"Piazza di Siena",lat:41.91,lon:12.48},
-    {n:"Galoppo",t:"Le corse al galoppo sono gare di velocità pura in pista.",l:"Capannelle",lat:41.83,lon:12.56},
-    {n:"Cavalli",t:"A Verona si tiene la fiera equestre piu importante.",l:"Verona",lat:45.41,lon:10.98},
-    {n:"Fantino",t:"Il fantino deve essere leggero per non rallentare il cavallo.",l:"Ascot",lat:51.41,lon:-0.67},
-    {n:"Purosangue",t:"Il purosangue inglese è la razza più veloce al mondo.",l:"Newmarket",lat:52.24,lon:0.40},
-    {n:"Il trotto",t:"Nel trotto il cavallo muove le gambe in diagonale.",l:"Bologna",lat:44.49,lon:11.34},
-    {n:"Scuderia",t:"Nella scuderia i cavalli vengono curati e nutriti bene.",l:"Parma",lat:44.80,lon:10.32},
-    {n:"Dressage",t:"Il dressage è come una danza elegante tra cavallo e cavaliere.",l:"Arezzo",lat:43.46,lon:11.88}
+    {n:"Al prato",t:"Il cavallo corre nel prato.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Pony",t:"Il pony è piccolo ma forte.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Criniera",t:"La criniera si spazzola piano.",l:"Arezzo",lat:43.46,lon:11.88},
+    {n:"Fieno",t:"Il cavallo mangia fieno e mele.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Zoccoli",t:"Gli zoccoli fanno toc toc.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Fantino",t:"Il fantino è piccolo e leggero.",l:"Siena",lat:43.31,lon:11.33},
+    {n:"La sella",t:"La sella sta sulla schiena.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Puledro",t:"Il puledro è il cucciolo del cavallo.",l:"Mantova",lat:45.15,lon:10.79},
+    {n:"Palio",t:"A Siena si corre il palio.",g:"Il palio è una corsa di cavalli tra i quartieri della città.",l:"Siena",lat:43.31,lon:11.33},
+    {n:"Ostacolo",t:"Il cavallo bianco salta l'ostacolo.",l:"Merano",lat:46.67,lon:11.16},
+    {n:"Orecchie",t:"Le orecchie del cavallo si muovono.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Riposo",t:"Dopo la corsa il cavallo riposa.",l:"Pisa",lat:43.72,lon:10.32}
   ],
   nerd:[
-    {n:"Super Mario",t:"Super Mario deve salvare la principessa nel castello.",l:"Kyoto",lat:34.98,lon:135.75},
-    {n:"Steve Jobs",t:"Steve Jobs ha fondato la Apple nel garage di casa sua.",l:"Cupertino",lat:37.33,lon:-122.03},
-    {n:"PlayStation",t:"La console di Sony ha rivoluzionato il mondo dei giochi.",l:"Tokyo",lat:35.68,lon:139.76},
-    {n:"Coding",t:"Scrivere codice aiuta a risolvere problemi complessi.",l:"Silicon Valley",lat:37.38,lon:-122.08},
-    {n:"Minecraft",t:"In Minecraft puoi costruire qualsiasi cosa con i cubi.",l:"Stoccolma",lat:59.32,lon:18.06},
-    {n:"Robot",t:"I computer imparano a svolgere compiti difficili da soli.",l:"San Francisco",lat:37.77,lon:-122.41},
-    {n:"Leonardo",t:"Leonardo fu il primo vero ingegnere della storia.",l:"Milano",lat:45.46,lon:9.17},
-    {n:"Olivetti",t:"L'azienda Olivetti ha portato il design tra i computer.",l:"Ivrea",lat:45.46,lon:7.87},
-    {n:"Visore",t:"Il visore permette di entrare in mondi digitali incredibili.",l:"Seattle",lat:47.60,lon:-122.33},
-    {n:"E-Sports",t:"I tornei di videogiochi riempiono interi stadi di fan.",l:"Seul",lat:37.56,lon:126.97}
+    {n:"Mouse",t:"Il mouse muove la freccia.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Robot",t:"Il robot esegue i comandi.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Stampante",t:"La stampante 3D crea oggetti.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Drone",t:"Il drone vola nel cielo.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Copia",t:"Cmd più c copia il testo.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Incolla",t:"Cmd più v incolla il testo.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Password",t:"La password è un segreto.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Ricarica",t:"Il tablet si ricarica la sera.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Pixel",t:"I pixel formano le immagini.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Codice",t:"Il codice è una lista di ordini.",g:"Il codice è la lingua con cui si danno i comandi al computer.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Laboratorio",t:"In laboratorio si impara giocando.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Salva",t:"Salva il lavoro prima di uscire.",l:"Cupertino",lat:37.33,lon:-122.03}
   ],
   viaggi:[
-    {n:"Colosseo",t:"Il Colosseo è il simbolo eterno della grandezza di Roma.",l:"Roma",lat:41.89,lon:12.49},
-    {n:"Venezia",t:"I canali di Venezia si possono visitare solo in barca.",l:"Venezia",lat:45.43,lon:12.33},
-    {n:"Pisa",t:"La torre pendente attira turisti da tutto il mondo.",l:"Pisa",lat:43.72,lon:10.40},
-    {n:"Dolomiti",t:"Le Tre Cime di Lavaredo sono montagne spettacolari.",l:"Dolomiti",lat:46.61,lon:12.30},
-    {n:"Pompei",t:"Gli scavi di Pompei raccontano la vita nell'antica Roma.",l:"Pompei",lat:40.75,lon:14.48},
-    {n:"Costiera",t:"I paesi colorati a picco sul mare sono meravigliosi.",l:"Amalfi",lat:40.63,lon:14.60},
-    {n:"Firenze",t:"Il duomo di Firenze ha una cupola di mattoni immensa.",l:"Firenze",lat:43.76,lon:11.25},
-    {n:"Etna",t:"L'Etna in Sicilia è il vulcano attivo più alto d'Europa.",l:"Catania",lat:37.75,lon:14.99},
-    {n:"Lago di Como",t:"Le ville sul lago di Como sono famose per la bellezza.",l:"Bellagio",lat:45.98,lon:9.26},
-    {n:"Matera",t:"I sassi di Matera sono antiche case scavate nella roccia.",l:"Matera",lat:40.66,lon:16.60}
+    {n:"Roma",t:"Roma è la capitale d'Italia.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Venezia",t:"A Venezia si va in barca.",l:"Venezia",lat:45.43,lon:12.33},
+    {n:"Pisa",t:"La torre di Pisa pende.",l:"Pisa",lat:43.72,lon:10.40},
+    {n:"Dolomiti",t:"Le Dolomiti diventano rosa la sera.",l:"Dolomiti",lat:46.61,lon:12.30},
+    {n:"Sardegna",t:"Il mare della Sardegna è azzurro.",l:"Barumini",lat:39.71,lon:9.00},
+    {n:"Vesuvio",t:"Il Vesuvio è un vulcano.",l:"Napoli",lat:40.82,lon:14.43},
+    {n:"La rocca",t:"Orzinuovi ha una rocca antica.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Etna",t:"In Sicilia c'è il vulcano Etna.",l:"Catania",lat:37.75,lon:14.99},
+    {n:"Treno",t:"Il treno corre tra le città.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Valigia",t:"La valigia si prepara con cura.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Mappa",t:"La mappa ci mostra la strada.",l:"Firenze",lat:43.76,lon:11.25},
+    {n:"Partenza",t:"Ogni viaggio inizia da casa.",l:"Orzinuovi",lat:45.40,lon:9.92}
   ],
   volley:[
-    {n:"Nazionale",t:"Gli azzurri del volley hanno vinto molti titoli mondiali.",l:"Roma",lat:41.93,lon:12.46},
-    {n:"Bagher",t:"Il bagher è fondamentale per ricevere la battuta avversaria.",l:"Modena",lat:44.65,lon:10.90},
-    {n:"Il muro",t:"Il muro serve a bloccare l'attacco della squadra opposta.",l:"Trento",lat:46.05,lon:11.11},
-    {n:"Schiacciata",t:"Lo schiacciatore salta in alto per chiudere il punto.",l:"Perugia",lat:43.10,lon:12.36},
-    {n:"Il libero",t:"Il libero ha la maglia diversa e difende in seconda linea.",l:"Treviso",lat:45.88,lon:12.30},
-    {n:"Velasco",t:"Velasco ha guidato la generazione dei fenomeni alla vittoria.",l:"Milano",lat:45.48,lon:9.12},
-    {n:"Femminile",t:"Le ragazze della nazionale sono campionesse d'Europa.",l:"Conegliano",lat:45.88,lon:12.30},
-    {n:"Battuta",t:"La battuta al salto è potente e difficile da ricevere.",l:"Civitanova",lat:43.30,lon:13.72},
-    {n:"Palleggio",t:"Il regista della squadra decide a chi alzare la palla.",l:"Monza",lat:45.58,lon:9.27},
-    {n:"Tie break",t:"Il quinto set si gioca solo fino a quindici punti.",l:"Verona",lat:45.43,lon:10.98}
+    {n:"Sopra la rete",t:"La palla vola sopra la rete.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Palleggio",t:"Il palleggio si fa con le dita.",l:"Perugia",lat:43.10,lon:12.36},
+    {n:"Bagher",t:"Il bagher si fa con le braccia.",g:"Il bagher è il colpo con le braccia unite per ricevere la palla.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Battuta",t:"La battuta inizia il gioco.",l:"Monza",lat:45.58,lon:9.27},
+    {n:"Muro",t:"A muro si salta in due.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Libero",t:"Il libero difende dietro.",l:"Treviso",lat:45.88,lon:12.30},
+    {n:"Tre tocchi",t:"Ogni squadra ha tre tocchi.",l:"Perugia",lat:43.10,lon:12.36},
+    {n:"Set",t:"Il set finisce a 25 punti.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"In sei",t:"In campo si gioca in sei.",l:"Verona",lat:45.43,lon:10.98},
+    {n:"Tuffo",t:"Il tuffo salva la palla.",l:"Civitanova",lat:43.30,lon:13.72},
+    {n:"Minivolley",t:"Nel minivolley si è in tre.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Abbraccio",t:"Dopo il punto ci si abbraccia.",l:"Conegliano",lat:45.88,lon:12.30}
   ],
   gym:[
-    {n:"Chechi",t:"Jury Chechi ha dominato la specialità degli anelli.",l:"Prato",lat:43.88,lon:11.09},
-    {n:"Ferrari",t:"La ginnasta bresciana è un esempio di longevità sportiva.",l:"Brescia",lat:45.54,lon:10.22},
-    {n:"La trave",t:"L'esercizio alla trave richiede un equilibrio perfetto.",l:"Milano",lat:45.46,lon:9.19},
-    {n:"Biles",t:"Simone Biles esegue salti con difficoltà altissima.",l:"Houston",lat:29.76,lon:-95.36},
-    {n:"Corpo libero",t:"Il corpo libero unisce acrobatica e coreografia musicale.",l:"Brescia",lat:45.54,lon:10.22},
-    {n:"Parallele",t:"Gli staggi asimmetrici richiedono forza nelle braccia.",l:"Roma",lat:41.93,lon:12.46},
-    {n:"Volteggio",t:"Dopo una rincorsa veloce l'atleta salta sulla tavola.",l:"Torino",lat:45.10,lon:7.64},
-    {n:"L'oro",t:"Salire sul gradino più alto del podio è un'emozione unica.",l:"Parigi",lat:48.85,lon:2.35},
-    {n:"Allenamento",t:"La ginnastica richiede ore di allenamento ogni giorno.",l:"Como",lat:45.80,lon:9.08},
-    {n:"I giudici",t:"I giudici valutano l'esecuzione e le difficoltà dell'esercizio.",l:"Losanna",lat:46.51,lon:6.63}
+    {n:"Capriola",t:"La capriola si fa sul tappeto.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Trave",t:"La trave è stretta e alta.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Verticale",t:"La verticale è dritta come un palo.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Nastro",t:"Il nastro danza nell'aria.",l:"Fabriano",lat:43.34,lon:12.90},
+    {n:"Salto",t:"Il salto finisce in piedi.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Clavette",t:"Le clavette girano veloci.",g:"Le clavette sono i birilli leggeri della ginnastica ritmica.",l:"Fabriano",lat:43.34,lon:12.90},
+    {n:"Riscaldamento",t:"In palestra ci si riscalda sempre.",l:"Como",lat:45.80,lon:9.08},
+    {n:"Cerchio",t:"Il cerchio rotola sul pavimento.",l:"Fabriano",lat:43.34,lon:12.90},
+    {n:"Saluto",t:"L'atleta saluta la giuria.",l:"Losanna",lat:46.51,lon:6.63},
+    {n:"Muscoli",t:"I muscoli crescono piano piano.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Equilibrio",t:"L'equilibrio si impara provando.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Podio",t:"Il podio ha tre gradini.",l:"Parigi",lat:48.85,lon:2.35}
   ],
   moto:[
-    {n:"Rossi",t:"Valentino Rossi ha vinto nove titoli mondiali in carriera.",l:"Tavullia",lat:43.89,lon:12.75},
-    {n:"Ducati",t:"La moto rossa di Borgo Panigale è velocissima in rettilineo.",l:"Bologna",lat:44.49,lon:11.34},
-    {n:"Cairoli",t:"Cairoli è una leggenda del motocross con nove mondiali.",l:"Patti",lat:38.13,lon:14.96},
-    {n:"Mugello",t:"Il circuito del Mugello è uno dei più belli del mondo.",l:"Scarperia",lat:43.99,lon:11.37},
-    {n:"Motocross",t:"Le gare di motocross si corrono su piste di terra e fango.",l:"Maggiora",lat:45.70,lon:8.42},
-    {n:"Agostini",t:"Agostini detiene ancora il record di vittorie nel motomondiale.",l:"Bergamo",lat:45.69,lon:9.67},
-    {n:"La staccata",t:"I piloti frenano fortissimo prima di entrare in curva.",l:"Misano",lat:43.96,lon:12.68},
-    {n:"MotoGP",t:"La classe regina delle moto offre gare spettacolari.",l:"Jerez",lat:36.70,lon:-6.03},
-    {n:"Meccanico",t:"I meccanici preparano la moto nel box prima della gara.",l:"Noale",lat:45.55,lon:12.07},
-    {n:"Impennata",t:"Festeggiare la vittoria con una impennata sulla ruota.",l:"Valencia",lat:39.48,lon:-0.37}
+    {n:"Due ruote",t:"La moto ha due ruote.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Casco",t:"Il casco protegge la testa.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Semaforo",t:"Il semaforo verde fa partire.",l:"Monza",lat:45.62,lon:9.28},
+    {n:"Vespa",t:"La Vespa è nata a Pontedera.",l:"Pontedera",lat:43.66,lon:10.63},
+    {n:"In curva",t:"Il pilota piega in curva.",l:"Mugello",lat:43.99,lon:11.37},
+    {n:"Le gomme",t:"I meccanici cambiano le gomme.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"Motore",t:"Il motore fa un gran rumore.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Minimoto",t:"La minimoto è per i bambini.",l:"Tavullia",lat:43.89,lon:12.75},
+    {n:"Nel fango",t:"Nel fango si corre il motocross.",l:"Maggiora",lat:45.70,lon:8.42},
+    {n:"A scacchi",t:"La bandiera a scacchi chiude la gara.",l:"Monza",lat:45.62,lon:9.28},
+    {n:"Guanti",t:"I guanti proteggono le mani.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"Riprovare",t:"Si vince anche cadendo e riprovando.",l:"Tavullia",lat:43.89,lon:12.75}
   ],
   music:[
-    {n:"Stradivari",t:"I violini di Antonio Stradivari hanno un suono inimitabile.",l:"Cremona",lat:45.13,lon:10.02},
-    {n:"Pianoforte",t:"Il pianoforte ha ottantotto tasti bianchi e neri.",l:"Milano",lat:45.46,lon:9.19},
-    {n:"Chitarra",t:"La chitarra elettrica è lo strumento simbolo del rock.",l:"Seattle",lat:47.60,lon:-122.33},
-    {n:"Orchestra",t:"Il direttore d'orchestra guida i musicisti con la bacchetta.",l:"Vienna",lat:48.20,lon:16.37},
-    {n:"Verdi",t:"Verdi ha composto opere liriche famose in tutto il mondo.",l:"Busseto",lat:44.98,lon:10.04},
-    {n:"Sassofono",t:"Il sassofono è uno strumento a fiato molto usato nel jazz.",l:"New Orleans",lat:29.95,lon:-90.07},
-    {n:"Batteria",t:"Il batterista tiene il ritmo per tutta la band musicale.",l:"Londra",lat:51.50,lon:-0.12},
-    {n:"Mozart",t:"Mozart era un bambino prodigio che componeva già da piccolo.",l:"Salisburgo",lat:47.80,lon:13.05},
-    {n:"Mandolino",t:"Il mandolino è uno strumento tipico della tradizione napoletana.",l:"Napoli",lat:40.85,lon:14.26},
-    {n:"Sanremo",t:"Il festival di Sanremo è la gara canora più famosa d'Italia.",l:"Sanremo",lat:43.81,lon:7.77}
+    {n:"Violino",t:"Il violino nasce a Cremona.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Pianoforte",t:"Il pianoforte ha tanti tasti.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Tamburo",t:"Il tamburo tiene il ritmo.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Sette note",t:"Le note musicali sono sette.",l:"Arezzo",lat:43.46,lon:11.88},
+    {n:"Coro",t:"Il coro canta tutto insieme.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Chitarra",t:"La chitarra ha sei corde.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Flauto",t:"Il flauto si suona soffiando.",l:"Vienna",lat:48.20,lon:16.37},
+    {n:"La banda",t:"La banda sfila per il paese.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Direttore",t:"Il direttore muove la bacchetta.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Ballare",t:"La musica fa ballare tutti.",l:"Sanremo",lat:43.81,lon:7.77},
+    {n:"Ogni voce",t:"Ogni voce del coro conta.",l:"Vienna",lat:48.20,lon:16.37},
+    {n:"Il ritmo",t:"Con le mani si fa il ritmo.",l:"Orzinuovi",lat:45.40,lon:9.92}
+  ]
+};
+
+/* ============ FRASI PREMIUM ============
+   Edizione 2026-27: frasi tutte nuove. Dove possibile riprendono contenuti già
+   incontrati nelle altre app della scuola (Master Chef, JoyBar, Mac Ninja,
+   Stampa 3D, Droni, Sicurnauti, NET CONTROL, Castello delle Case, Scacchi,
+   Quadriappesi, prof. Galiano) come rinforzo cognitivo. */
+const premiumPhrases = {
+  cucina:[
+    {n:"Patrimonio UNESCO",t:"Nel 2025 la cucina italiana è diventata patrimonio dell'umanità.",l:"Nuova Delhi",lat:28.61,lon:77.20},
+    {n:"Carbonara",t:"La vera carbonara non contiene mai la panna e nemmeno la cipolla.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Crema d'uovo",t:"La crema della carbonara nasce solo da tuorli e pecorino.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Amatriciana",t:"L'amatriciana deriva dalla gricia arricchita con il pomodoro.",g:"La gricia è la pasta con guanciale e pecorino, senza pomodoro.",l:"Amatrice",lat:42.63,lon:13.29},
+    {n:"Pesto nel mortaio",t:"Il pesto si fa nel mortaio perché il frullatore scalda il basilico.",l:"Genova",lat:44.40,lon:8.94},
+    {n:"Ragù depositato",t:"La ricetta del ragù è depositata a Bologna dal 1982.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Risotto giallo",t:"Il risotto alla milanese deve il suo colore oro allo zafferano.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Zafferano",t:"Per un chilo di zafferano servono 150.000 fiori raccolti a mano.",l:"L'Aquila",lat:42.35,lon:13.40},
+    {n:"Margherita",t:"La pizza Margherita fu creata nel 1889 in onore della regina.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Arancino",t:"A Catania si dice arancino mentre a Palermo si dice arancina.",l:"Catania",lat:37.50,lon:15.09},
+    {n:"Fiorentina",t:"La bistecca alla fiorentina si taglia alta almeno tre dita.",l:"Firenze",lat:43.76,lon:11.25},
+    {n:"Tiramisù",t:"Il tiramisù è nato a Treviso in un ristorante negli anni sessanta.",l:"Treviso",lat:45.66,lon:12.24},
+    {n:"Laganum",t:"Gli antichi romani conoscevano già le lasagne col nome laganum.",g:"Laganum era una sfoglia sottile di grano cotta al forno.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Proteine complete",t:"Pasta e fagioli insieme formano proteine complete per il corpo.",l:"Napoli",lat:40.85,lon:14.26},
+    {n:"Ricetta algoritmo",t:"Una ricetta è una sequenza ordinata di passi, come un algoritmo.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Insalatona",t:"Al bar della scuola l'insalatona è il piatto più salutare.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Il resto",t:"Un bravo cassiere controlla sempre il resto prima di darlo.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Parmigiano",t:"Il parmigiano reggiano stagiona per almeno dodici mesi.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Balsamico",t:"L'aceto balsamico tradizionale invecchia in botti di legno.",l:"Modena",lat:44.65,lon:10.92},
+    {n:"Focaccia",t:"La focaccia ligure si gusta calda con l'olio d'oliva.",l:"Recco",lat:44.36,lon:9.14}
+  ],
+  basket:[
+    {n:"Due cesti",t:"Il basket nacque nel 1891 in una palestra con due cesti di frutta.",l:"Springfield",lat:42.10,lon:-72.59},
+    {n:"Regola dei 24",t:"Ogni squadra ha solo 24 secondi per concludere l'azione.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Bargnani",t:"Andrea Bargnani fu la prima scelta assoluta del draft del 2006.",g:"Il draft è la cerimonia in cui le squadre NBA scelgono i giovani.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Datome",t:"Gigi Datome è stato il capitano della nazionale italiana.",l:"Olbia",lat:40.92,lon:9.50},
+    {n:"Tiro libero",t:"Il tiro libero vale un punto e si tira senza nessun difensore.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Rimbalzo",t:"Chi cattura il rimbalzo regala alla squadra un nuovo attacco.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Passi",t:"Muovere i piedi senza palleggiare è una violazione detta passi.",l:"Torino",lat:45.07,lon:7.68},
+    {n:"Olimpia",t:"L'Olimpia Milano ha vinto più di trenta scudetti italiani.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Varese stellare",t:"Negli anni settanta la Pallacanestro Varese dominava in Europa.",l:"Varese",lat:45.82,lon:8.82},
+    {n:"Trenta squadre",t:"Nella NBA giocano trenta squadre divise in due conference.",g:"Le conference sono i due gironi della NBA, est e ovest.",l:"New York",lat:40.71,lon:-74.00},
+    {n:"Tripla doppia",t:"La tripla doppia unisce punti, rimbalzi e assist in doppia cifra.",l:"Los Angeles",lat:34.04,lon:-118.26},
+    {n:"Minibasket",t:"Nel minibasket il canestro è più basso e la palla è più piccola.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Campo del cortile",t:"Il campo da basket del cortile ospita anche le sfide delle Case.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Palla a spicchi",t:"La palla da basket ha otto spicchi e pesa circa seicento grammi.",l:"Treviso",lat:45.66,lon:12.24},
+    {n:"Arbitri",t:"Gli arbitri fischiano il fallo quando il contatto è irregolare.",l:"Udine",lat:46.06,lon:13.23},
+    {n:"Pick and roll",t:"Il blocco e il taglio verso il canestro si chiama pick and roll.",l:"Sassari",lat:40.72,lon:8.56},
+    {n:"Virtus in Europa",t:"La Virtus Bologna ha vinto due volte la coppa dei campioni.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Time out",t:"Nel time out l'allenatore disegna lo schema sulla lavagnetta.",l:"Pesaro",lat:43.91,lon:12.91},
+    {n:"Supplementare",t:"Se la partita finisce in parità si giocano altri 5 minuti.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Passaggio",t:"Un passaggio preciso vale quanto un canestro spettacolare.",l:"Cremona",lat:45.13,lon:10.02}
+  ],
+  pesca:[
+    {n:"Storione",t:"Lo storione del Po può superare i due metri di lunghezza.",l:"Fiume Po",lat:44.90,lon:12.00},
+    {n:"Temolo",t:"Il temolo ha una grande pinna colorata simile a una bandiera.",g:"Il temolo è un pesce elegante dei fiumi freddi di montagna.",l:"Trentino",lat:46.07,lon:11.12},
+    {n:"Trasimeno",t:"Il lago Trasimeno è famoso per la pesca della carpa regina.",l:"Lago Trasimeno",lat:43.13,lon:12.10},
+    {n:"Esche finte",t:"Le esche artificiali imitano il movimento dei piccoli pesci.",l:"Lago d'Iseo",lat:45.66,lon:10.05},
+    {n:"Lucioperca",t:"Il lucioperca caccia all'alba quando la luce è ancora debole.",g:"Il lucioperca è un pesce predatore, cugino del persico.",l:"Mantova",lat:45.15,lon:10.79},
+    {n:"Rilascio",t:"Nel catch and release il pesce torna libero dopo la foto.",l:"Lago di Garda",lat:45.60,lon:10.60},
+    {n:"Missoltini",t:"I missoltini del lago di Como sono agoni essiccati al sole.",l:"Como",lat:45.80,lon:9.08},
+    {n:"Canna fissa",t:"La canna fissa non ha il mulinello e si usa vicino a riva.",l:"Fiume Oglio",lat:45.40,lon:9.92},
+    {n:"Fiume Oglio",t:"Il fiume Oglio scorre vicino a Orzinuovi e nasce dalle Alpi.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Cavedano",t:"Il cavedano scappa appena vede l'ombra del pescatore.",l:"Fiume Oglio",lat:45.40,lon:9.92},
+    {n:"Mosca finta",t:"Nella pesca a mosca l'esca è una piuma legata a mano.",l:"Valsesia",lat:45.83,lon:8.05},
+    {n:"Il barbo",t:"Il barbo cerca il cibo sul fondo con i suoi baffi sensibili.",l:"Fiume Po",lat:44.90,lon:12.00},
+    {n:"Fermo pesca",t:"In primavera la pesca si ferma per proteggere le uova dei pesci.",l:"Trentino",lat:46.07,lon:11.12},
+    {n:"Martin pescatore",t:"Il martin pescatore si tuffa come una freccia azzurra.",l:"Delta del Po",lat:44.85,lon:12.45},
+    {n:"Airone",t:"L'airone cenerino resta immobile per ore aspettando la preda.",l:"Comacchio",lat:44.69,lon:12.18},
+    {n:"Santuario",t:"Nel mar Ligure vive un santuario protetto di balene e delfini.",l:"Mar Ligure",lat:43.90,lon:8.50},
+    {n:"Il polpo",t:"Il polpo cambia colore per nascondersi tra gli scogli.",l:"Golfo di Napoli",lat:40.79,lon:14.20},
+    {n:"Tonnare",t:"Le antiche tonnare di Favignana raccontano la pesca del tonno.",l:"Favignana",lat:37.93,lon:12.33},
+    {n:"Nodo sicuro",t:"Un pescatore esperto controlla sempre il nodo prima del lancio.",l:"Lago d'Iseo",lat:45.66,lon:10.05},
+    {n:"Silenzio",t:"Il silenzio è l'attrezzo più prezioso del pescatore paziente.",l:"Clusane",lat:45.66,lon:10.00}
+  ],
+  calcio:[
+    {n:"Spagna 1982",t:"L'Italia di Bearzot vinse il mondiale di Spagna nel 1982.",l:"Madrid",lat:40.42,lon:-3.70},
+    {n:"Pertini",t:"Il presidente Pertini esultò in tribuna per il gol di Tardelli.",l:"Madrid",lat:40.42,lon:-3.70},
+    {n:"Urlo di Tardelli",t:"L'urlo di Tardelli dopo il gol è entrato nella storia.",l:"Madrid",lat:40.42,lon:-3.70},
+    {n:"Berlino 2006",t:"Cannavaro alzò la coppa del mondo a Berlino nel 2006.",l:"Berlino",lat:52.52,lon:13.40},
+    {n:"Buffon",t:"Gianluigi Buffon ha giocato più di mille partite in carriera.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Meazza",t:"Giuseppe Meazza vinse due mondiali e diede il nome a San Siro.",l:"Milano",lat:45.47,lon:9.12},
+    {n:"Traversa",t:"Quando la palla colpisce la traversa lo stadio trattiene il fiato.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Var",t:"Con il var l'arbitro può rivedere l'azione dubbia al monitor.",g:"Var significa video assistente arbitrale.",l:"Roma",lat:41.93,lon:12.45},
+    {n:"Giovanili",t:"Nelle giovanili si impara prima il rispetto e poi la tattica.",l:"Coverciano",lat:43.77,lon:11.29},
+    {n:"Catenaccio",t:"Il catenaccio era una difesa italiana famosa in tutto il mondo.",l:"Milano",lat:45.47,lon:9.12},
+    {n:"Zona Cesarini",t:"Un gol negli ultimi minuti si dice segnato in zona Cesarini.",g:"Cesarini era un giocatore famoso per i gol all'ultimo minuto.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Scarpini",t:"I primi scarpini avevano i tacchetti di cuoio inchiodati.",l:"Londra",lat:51.50,lon:-0.12},
+    {n:"Azzurre",t:"Le azzurre del calcio giocano i mondiali con grande coraggio.",l:"Coverciano",lat:43.77,lon:11.29},
+    {n:"Subbuteo",t:"Con il Subbuteo il calcio si gioca sul tavolo con un dito.",l:"Londra",lat:51.50,lon:-0.12},
+    {n:"Stadio Maradona",t:"Lo stadio di Napoli oggi porta il nome di Diego Maradona.",l:"Napoli",lat:40.82,lon:14.19},
+    {n:"La curva",t:"I cori della curva spingono la squadra nei momenti difficili.",l:"Bergamo",lat:45.70,lon:9.68},
+    {n:"Palloni d'oro",t:"Rivera, Rossi, Baggio e Cannavaro hanno vinto il pallone d'oro.",l:"Parigi",lat:48.85,lon:2.35},
+    {n:"Fair play",t:"Restituire la palla agli avversari è un gesto di fair play.",l:"Coverciano",lat:43.77,lon:11.29},
+    {n:"Oratorio",t:"I campioni più grandi hanno iniziato sul campo dell'oratorio.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Portiere volante",t:"Nel calcio a cinque il portiere può attaccare come gli altri.",l:"Roma",lat:41.90,lon:12.49}
+  ],
+  ippica:[
+    {n:"Ribot",t:"Il cavallo Ribot vinse tutte le sedici corse della sua carriera.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Maniscalco",t:"Il maniscalco cambia i ferri al cavallo ogni sei settimane circa.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Palio di Asti",t:"Anche la città di Asti corre un palio antico di settecento anni.",l:"Asti",lat:44.90,lon:8.21},
+    {n:"Contrade",t:"A Siena ogni contrada ha un nome, una bandiera e una rivale.",l:"Siena",lat:43.31,lon:11.33},
+    {n:"La mossa",t:"Il palio parte solo quando il mossiere abbassa il canape.",g:"Il mossiere dà il via, il canape è la corda tesa della partenza.",l:"Siena",lat:43.31,lon:11.33},
+    {n:"Criniera",t:"Spazzolare la criniera calma il cavallo e crea fiducia.",l:"Arezzo",lat:43.46,lon:11.88},
+    {n:"Paddock",t:"Dopo il lavoro il cavallo riposa libero nel paddock.",g:"Il paddock è il recinto all'aperto accanto alla scuderia.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Fieno",t:"Un cavallo adulto mangia più di dieci chili di fieno al giorno.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Il pony",t:"Il pony non è un cucciolo ma un cavallo di taglia piccola.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Andature",t:"Passo, trotto e galoppo sono le tre andature del cavallo.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Zoccoli",t:"Lo zoccolo del cavallo cresce come le nostre unghie.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Merano",t:"L'ippodromo di Merano è famoso per le corse a ostacoli.",l:"Merano",lat:46.67,lon:11.16},
+    {n:"Derby",t:"Il derby italiano di galoppo si corre alle Capannelle.",l:"Roma",lat:41.83,lon:12.56},
+    {n:"Quarter horse",t:"Il quarter horse scatta velocissimo sul quarto di miglio.",g:"Il quarto di miglio è una distanza di circa 400 metri.",l:"Houston",lat:29.76,lon:-95.36},
+    {n:"Monta western",t:"Nella monta western si tiene la briglia con una mano sola.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Volteggio",t:"Nel volteggio si fa ginnastica sulla groppa del cavallo.",l:"Verona",lat:45.41,lon:10.98},
+    {n:"Ippoterapia",t:"Il contatto con i cavalli aiuta molti bambini a stare meglio.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Fantini leggeri",t:"I fantini pesano poco per non affaticare il cavallo in corsa.",l:"Pisa",lat:43.72,lon:10.32},
+    {n:"San Rossore",t:"L'ippodromo di San Rossore corre tra i pini vicino a Pisa.",l:"Pisa",lat:43.72,lon:10.32},
+    {n:"Orecchie",t:"Le orecchie del cavallo ruotano e raccontano il suo umore.",l:"Mantova",lat:45.15,lon:10.79}
+  ],
+  nerd:[
+    {n:"Copia",t:"La combinazione cmd più c copia quello che hai selezionato.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Incolla",t:"Con cmd più v incolli il contenuto degli appunti dove vuoi.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Annulla",t:"La scorciatoia cmd più z annulla l'ultimo errore commesso.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Spotlight",t:"Cmd più barra spaziatrice apre la ricerca Spotlight del Mac.",l:"Cupertino",lat:37.33,lon:-122.03},
+    {n:"Kobra Plus",t:"La stampante 3D del laboratorio si chiama Anycubic Kobra Plus.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Filamento PLA",t:"Il filamento pla si stampa con l'ugello a circa 200 gradi.",g:"Il pla è la plastica più usata nelle stampe 3D della scuola.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"G-code",t:"Il g-code è la lista di istruzioni che guida la stampante 3D.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Strato su strato",t:"La stampa 3D costruisce l'oggetto uno strato dopo l'altro.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Slicer",t:"Il programma Cura affetta il modello e prepara la stampa.",l:"Utrecht",lat:52.09,lon:5.12},
+    {n:"Droni",t:"Un drone esegue in volo la sequenza di comandi programmata.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Led nel cielo",t:"I led dei droni disegnano figure luminose nel cielo notturno.",l:"Torino",lat:45.07,lon:7.68},
+    {n:"Phishing",t:"Il phishing usa messaggi finti per rubare i dati personali.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Due fattori",t:"L'autenticazione a due fattori protegge meglio i tuoi account.",g:"Due fattori vuol dire password più un secondo controllo, come un codice.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Deepfake",t:"Un deepfake è un video falso creato per ingannare chi guarda.",l:"San Francisco",lat:37.77,lon:-122.41},
+    {n:"Backup",t:"Un backup regolare salva i tuoi file se il computer si rompe.",l:"Seattle",lat:47.60,lon:-122.33},
+    {n:"Cavi sottomarini",t:"Internet viaggia dentro cavi posati sul fondo degli oceani.",l:"Oceano Atlantico",lat:47.00,lon:-30.00},
+    {n:"Satelliti",t:"I satelliti per le comunicazioni orbitano a 36.000 chilometri.",l:"Kourou",lat:5.16,lon:-52.65},
+    {n:"Ping",t:"Il comando ping controlla se un computer risponde in rete.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Pixel",t:"Ogni immagine digitale è un mosaico di minuscoli pixel colorati.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Voce clonata",t:"Una voce al telefono può essere clonata, meglio verificare sempre.",l:"Milano",lat:45.46,lon:9.19}
+  ],
+  viaggi:[
+    {n:"Cinque Terre",t:"I sentieri delle Cinque Terre collegano cinque borghi sul mare.",l:"Riomaggiore",lat:44.10,lon:9.74},
+    {n:"Urbino",t:"Urbino fu una capitale del Rinascimento tra le colline.",l:"Urbino",lat:43.73,lon:12.64},
+    {n:"Castel del Monte",t:"Castel del Monte ha una pianta a forma di ottagono perfetto.",l:"Andria",lat:41.08,lon:16.27},
+    {n:"Nuraghi",t:"I nuraghi della Sardegna sono torri di pietra di 3500 anni fa.",l:"Barumini",lat:39.71,lon:9.00},
+    {n:"La Mole",t:"La Mole Antonelliana ospita il museo del cinema di Torino.",l:"Torino",lat:45.07,lon:7.68},
+    {n:"Assisi",t:"Ad Assisi gli affreschi di Giotto raccontano san Francesco.",l:"Assisi",lat:43.07,lon:12.62},
+    {n:"Paestum",t:"I templi greci di Paestum sono in piedi da 2500 anni.",l:"Paestum",lat:40.42,lon:15.01},
+    {n:"Reggia",t:"Il parco della reggia di Caserta è lungo tre chilometri.",l:"Caserta",lat:41.07,lon:14.33},
+    {n:"Orvieto",t:"Il duomo di Orvieto brilla di mosaici dorati sulla rupe.",l:"Orvieto",lat:42.72,lon:12.11},
+    {n:"La bora",t:"La bora di Trieste soffia forte tra il mare e il Carso.",g:"Il Carso è l'altopiano roccioso alle spalle di Trieste.",l:"Trieste",lat:45.65,lon:13.77},
+    {n:"Agrigento",t:"La valle dei templi di Agrigento guarda verso il mare.",l:"Agrigento",lat:37.29,lon:13.59},
+    {n:"Stelvio",t:"La strada dello Stelvio sale con più di 40 tornanti.",l:"Passo Stelvio",lat:46.53,lon:10.45},
+    {n:"Rialto",t:"Il ponte di Rialto attraversa il Canal Grande da oltre 400 anni.",l:"Venezia",lat:45.43,lon:12.33},
+    {n:"Ravenna",t:"I mosaici di Ravenna brillano d'oro da millecinquecento anni.",l:"Ravenna",lat:44.42,lon:12.20},
+    {n:"Orzinuovi 1193",t:"Orzinuovi nacque nel 1193 come borgo fortificato di Brescia.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"La rocca",t:"La rocca di Orzinuovi oggi ospita mostre ed eventi del paese.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Lago nero",t:"Nel castello immaginario della scuola c'è anche un lago nero.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Quidditch",t:"Nel volo sul castello il campo da calcio diventa un campo da quidditch.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Matera",t:"A Matera si dorme in alberghi scavati dentro la roccia.",l:"Matera",lat:40.66,lon:16.60},
+    {n:"Enrosadira",t:"Al tramonto le Dolomiti si accendono di rosa per l'enrosadira.",g:"Enrosadira è una parola ladina che significa diventare di rosa.",l:"Dolomiti",lat:46.61,lon:12.30}
+  ],
+  volley:[
+    {n:"Mondiale 2022",t:"Gli azzurri di De Giorgi hanno vinto il mondiale nel 2022.",g:"De Giorgi è l'allenatore della nazionale maschile di volley.",l:"Katowice",lat:50.26,lon:19.02},
+    {n:"Egonu",t:"Paola Egonu schiaccia a più di cento chilometri orari.",l:"Milano",lat:45.48,lon:9.12},
+    {n:"Set a 25",t:"Un set si vince a 25 punti con due punti di vantaggio.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Rotazione",t:"A ogni cambio palla i giocatori ruotano di una posizione.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Tre tocchi",t:"Ogni squadra ha tre tocchi per mandare la palla di là.",l:"Perugia",lat:43.10,lon:12.36},
+    {n:"Pallonetto",t:"Il pallonetto è un tocco morbido che sorprende il muro.",l:"Civitanova",lat:43.30,lon:13.72},
+    {n:"Mani fuori",t:"Colpire le mani del muro e mandare fuori la palla vale punto.",l:"Piacenza",lat:45.05,lon:9.70},
+    {n:"Beach volley",t:"Il beach volley si gioca in due sulla sabbia calda.",l:"Ostia",lat:41.73,lon:12.28},
+    {n:"Rete alta",t:"La rete del volley maschile è alta due metri e 43 centimetri.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Ricezione",t:"Una buona ricezione è il primo mattone di ogni attacco.",l:"Verona",lat:45.43,lon:10.98},
+    {n:"Alzatore",t:"L'alzatore è il regista che sceglie chi manda a schiacciare.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Ace",t:"Una battuta che tocca terra senza ricezione si chiama ace.",l:"Monza",lat:45.58,lon:9.27},
+    {n:"Superlega",t:"La Superlega italiana è tra i campionati più forti del mondo.",l:"Bologna",lat:44.49,lon:11.34},
+    {n:"Sitting volley",t:"Nel sitting volley si gioca seduti e la rete è più bassa.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Pantere",t:"Le pantere di Conegliano hanno vinto trofei in tutto il mondo.",l:"Conegliano",lat:45.88,lon:12.30},
+    {n:"Video check",t:"Con il video check l'arbitro rivede se la palla era dentro.",l:"Trento",lat:46.05,lon:11.11},
+    {n:"Polpastrelli",t:"Il palleggio si fa con i polpastrelli, non con il palmo.",l:"Perugia",lat:43.10,lon:12.36},
+    {n:"Tuffo",t:"Un tuffo coraggioso può salvare un punto già perduto.",l:"Civitanova",lat:43.30,lon:13.72},
+    {n:"Capitano",t:"Solo il capitano può parlare con l'arbitro durante il gioco.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"Minivolley",t:"Nel minivolley il campo è piccolo e si gioca tre contro tre.",l:"Orzinuovi",lat:45.40,lon:9.92}
+  ],
+  gym:[
+    {n:"Farfalle",t:"Le farfalle della ritmica volteggiano con nastri e cerchi.",g:"Le farfalle è il soprannome della nazionale di ritmica.",l:"Fabriano",lat:43.34,lon:12.90},
+    {n:"Cassina",t:"Igor Cassina vinse l'oro alla sbarra con un movimento suo.",l:"Atene",lat:37.98,lon:23.73},
+    {n:"Ferrari a Tokyo",t:"Vanessa Ferrari ha vinto l'argento al corpo libero a Tokyo.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Cinque attrezzi",t:"Fune, cerchio, palla, clavette e nastro sono i cinque attrezzi.",l:"Fabriano",lat:43.34,lon:12.90},
+    {n:"La croce",t:"Agli anelli la croce richiede braccia fortissime e ferme.",l:"Prato",lat:43.88,lon:11.09},
+    {n:"Magnesite",t:"La polvere bianca sulle mani si chiama magnesite.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Brixia",t:"La società Brixia di Brescia ha cresciuto molte campionesse.",l:"Brescia",lat:45.54,lon:10.22},
+    {n:"Rondata",t:"La rondata trasforma la rincorsa in energia per il salto.",g:"La rondata è una ruota veloce che finisce con i piedi uniti.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Verticale",t:"La verticale perfetta è una linea dritta dai polsi ai piedi.",l:"Torino",lat:45.10,lon:7.64},
+    {n:"Granvolte",t:"Alla sbarra i giri completi si chiamano granvolte.",l:"Roma",lat:41.93,lon:12.46},
+    {n:"Trampolino",t:"Il trampolino elastico è una specialità olimpica dal 2000.",l:"Sydney",lat:-33.87,lon:151.21},
+    {n:"Punteggio",t:"Il punteggio somma la difficoltà e la qualità dell'esecuzione.",l:"Losanna",lat:46.51,lon:6.63},
+    {n:"Riscaldamento",t:"Senza riscaldamento i muscoli rischiano strappi dolorosi.",l:"Como",lat:45.80,lon:9.08},
+    {n:"La paura",t:"Anche i campioni hanno paura, ma la allenano come i muscoli.",l:"Houston",lat:29.76,lon:-95.36},
+    {n:"Body di gara",t:"I body da gara brillano di cristalli cuciti a mano.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Pedana",t:"La pedana del corpo libero misura dodici metri per dodici.",l:"Parigi",lat:48.85,lon:2.35},
+    {n:"Maniglie",t:"Al cavallo con maniglie le gambe girano senza mai fermarsi.",l:"Losanna",lat:46.51,lon:6.63},
+    {n:"Yurchenko",t:"Il salto Yurchenko parte con una rondata sulla pedana.",g:"Yurchenko è la ginnasta che inventò questo tipo di rincorsa.",l:"Tokyo",lat:35.68,lon:139.76},
+    {n:"Giuria",t:"La giuria toglie punti per ogni passo fuori dalla pedana.",l:"Losanna",lat:46.51,lon:6.63},
+    {n:"Palestra di paese",t:"Ogni grande storia di ginnastica inizia in una palestra di paese.",l:"Orzinuovi",lat:45.40,lon:9.92}
+  ],
+  moto:[
+    {n:"Bagnaia",t:"Pecco Bagnaia ha vinto due titoli mondiali con la Ducati.",l:"Torino",lat:45.07,lon:7.68},
+    {n:"Moto Guzzi",t:"La Moto Guzzi nasce nel 1921 sul lago di Como a Mandello.",l:"Mandello",lat:45.92,lon:9.32},
+    {n:"Vespa",t:"La Vespa è nata a Pontedera nel 1946 ed è ancora prodotta lì.",l:"Pontedera",lat:43.66,lon:10.63},
+    {n:"Museo Piaggio",t:"Il museo Piaggio conserva le Vespe più rare della storia.",l:"Pontedera",lat:43.66,lon:10.63},
+    {n:"Il Sic",t:"Il circuito di Misano è intitolato a Marco Simoncelli.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"Parabolica",t:"A Monza la curva parabolica chiude il giro velocissimo.",g:"La parabolica è una curva lunga che si percorre in piena velocità.",l:"Monza",lat:45.62,lon:9.28},
+    {n:"Airbag",t:"Le tute dei piloti hanno un airbag che si gonfia nelle cadute.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"La piega",t:"In curva il pilota piega fino a sfiorare l'asfalto col gomito.",l:"Mugello",lat:43.99,lon:11.37},
+    {n:"Semaforo",t:"Alla partenza il semaforo si spegne e la gara esplode.",l:"Mugello",lat:43.99,lon:11.37},
+    {n:"Minimoto",t:"Molti campioni hanno cominciato da bambini sulle minimoto.",l:"Tavullia",lat:43.89,lon:12.75},
+    {n:"Academy",t:"La riders academy di Tavullia allena i giovani piloti italiani.",l:"Tavullia",lat:43.89,lon:12.75},
+    {n:"Enduro",t:"L'enduro si corre nei boschi tra salite, sassi e fango.",l:"Bergamo",lat:45.69,lon:9.67},
+    {n:"Trial",t:"Nel trial vince chi non appoggia mai i piedi a terra.",l:"Bergamo",lat:45.69,lon:9.67},
+    {n:"Cambio gomme",t:"Ai box i meccanici cambiano le gomme in pochi secondi.",l:"Misano",lat:43.96,lon:12.68},
+    {n:"La scia",t:"In rettilineo la scia di chi ti precede ti fa guadagnare velocità.",l:"Monza",lat:45.62,lon:9.28},
+    {n:"Casco",t:"Il casco integrale protegge la testa ed è sempre obbligatorio.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Dakar",t:"La Dakar è la corsa nel deserto più dura del mondo.",l:"Riad",lat:24.71,lon:46.68},
+    {n:"Sei giorni",t:"La sei giorni di enduro è il mondiale a squadre più antico.",g:"L'enduro è la corsa in moto su sentieri, boschi e salite.",l:"Bergamo",lat:45.69,lon:9.67},
+    {n:"Cross junior",t:"Nel motocross junior si salta già come i professionisti.",l:"Maggiora",lat:45.70,lon:8.42},
+    {n:"Protezioni",t:"Guanti e stivali proteggono il pilota in ogni allenamento.",l:"Mugello",lat:43.99,lon:11.37}
+  ],
+  music:[
+    {n:"Pavarotti",t:"La voce di Luciano Pavarotti ha riempito i teatri del mondo.",l:"Modena",lat:44.65,lon:10.90},
+    {n:"San Carlo",t:"Il San Carlo di Napoli è il teatro più antico ancora attivo.",l:"Napoli",lat:40.84,lon:14.25},
+    {n:"La Fenice",t:"Il teatro La Fenice è rinato due volte dalle sue ceneri.",l:"Venezia",lat:45.43,lon:12.33},
+    {n:"Arena",t:"D'estate l'arena di Verona diventa un teatro sotto le stelle.",l:"Verona",lat:45.44,lon:10.99},
+    {n:"Liuteria",t:"La liuteria di Cremona è patrimonio immateriale UNESCO.",g:"La liuteria è l'arte di costruire violini e strumenti a corda.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Settanta pezzi",t:"In bottega un violino nasce da settanta pezzi di legno.",l:"Cremona",lat:45.13,lon:10.02},
+    {n:"Morricone",t:"Le musiche di Ennio Morricone hanno vinto due premi Oscar.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Rossini",t:"Rossini compose il Barbiere di Siviglia in meno di un mese.",l:"Pesaro",lat:43.91,lon:12.91},
+    {n:"Puccini",t:"Puccini scrisse le sue opere in riva a un lago toscano.",l:"Torre del Lago",lat:43.83,lon:10.29},
+    {n:"Canzone poesia",t:"Anche il testo di una canzone può essere letto come una poesia.",l:"Orzinuovi",lat:45.40,lon:9.92},
+    {n:"Donna cannone",t:"La donna cannone di De Gregori è una poesia in musica.",l:"Roma",lat:41.90,lon:12.49},
+    {n:"Sogna ragazzo",t:"Vecchioni canta ai ragazzi di non smettere mai di sognare.",l:"Milano",lat:45.46,lon:9.19},
+    {n:"Do di petto",t:"Il do di petto è la nota più attesa dagli amanti dell'opera.",g:"Il do di petto è la nota acuta più difficile per un tenore.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Loggione",t:"Il loggione del teatro Regio di Parma è severissimo.",g:"Il loggione è la parte più alta del teatro, dal pubblico esperto.",l:"Parma",lat:44.80,lon:10.32},
+    {n:"Il coro",t:"In un coro ogni voce conta, dal soprano fino al basso.",l:"Vienna",lat:48.20,lon:16.37},
+    {n:"Metronomo",t:"Il metronomo scandisce il tempo con il suo tic costante.",l:"Vienna",lat:48.20,lon:16.37},
+    {n:"Ukulele",t:"L'ukulele ha quattro corde ed è nato alle isole Hawaii.",l:"Honolulu",lat:21.31,lon:-157.86},
+    {n:"Theremin",t:"Il theremin si suona senza toccarlo, muovendo le mani in aria.",g:"Il theremin è uno strumento elettronico inventato nel 1920.",l:"Mosca",lat:55.75,lon:37.62},
+    {n:"Guido d'Arezzo",t:"Le sette note musicali le inventò un monaco di nome Guido.",l:"Arezzo",lat:43.46,lon:11.88},
+    {n:"Body percussion",t:"Con la body percussion il corpo diventa uno strumento musicale.",l:"Orzinuovi",lat:45.40,lon:9.92}
   ]
 };
 
 /* ============ GENERATORE SEMANTICO ============ */
 const semantics = {
-  cucina:[{s:["Il cuoco","Lo chef","Il pasticcere"],v:["impasta","decora","assaggia"],c:["la torta dolce.","il pane caldo.","la zuppa gustosa."],l:"Cucina",lat:45.46,lon:9.19}],
-  basket:[{s:["Il pivot","La guardia","L'ala grande"],v:["stoppa","passa","tira"],c:["sotto canestro.","da tre punti.","con precisione."],l:"Palazzetto",lat:44.49,lon:11.34}],
-  pesca: [{s:["Il pescatore","L'esperto"],v:["lancia","recupera","attende"],c:["l'amo nel lago.","la lenza lunga.","il pesce grande."],l:"Fiume Po",lat:44.90,lon:12.00}],
-  calcio:[{s:["L'arbitro","Il mediano","Il mister"],v:["fischia","corre","chiama"],c:["il fallo netto.","sulla fascia.","lo schema tattico."],l:"Stadio",lat:45.10,lon:7.64}],
-  ippica:[{s:["Il fantino","Lo stalliere"],v:["spazzola","guida","monta"],c:["il cavallo nero.","verso la pista.","con molta cura."],l:"Scuderia",lat:43.31,lon:11.33}],
-  nerd:  [{s:["Il programmatore","L'ingegnere"],v:["scrive","prova","aggiorna"],c:["il codice nuovo.","il robot veloce.","il gioco divertente."],l:"Laboratorio",lat:43.72,lon:10.40}],
-  viaggi:[{s:["Il viaggiatore","La guida"],v:["osserva","spiega","scopre"],c:["il monumento antico.","la storia locale.","una piazza nuova."],l:"Citta d'arte",lat:41.90,lon:12.49}],
-  volley:[{s:["Il centrale","L'allenatore"],v:["chiama","salta","difende"],c:["il tempo tecnico.","a muro alto.","la palla insidiosa."],l:"Palasport",lat:46.05,lon:11.11}],
-  gym:   [{s:["L'atleta","La ginnasta","Il campione"],v:["esegue","prova","studia"],c:["la capriola.","il salto teso.","la coreografia."],l:"Palestra",lat:45.54,lon:10.22}],
-  moto:  [{s:["Il meccanico","Il pilota"],v:["controlla","cambia","scalda"],c:["la gomma nuova.","la marcia veloce.","il motore potente."],l:"Box",lat:44.64,lon:10.92}],
-  music: [{s:["Il musicista","Il tenore"],v:["legge","canta","prova"],c:["lo spartito difficile.","l'opera lirica.","l'accordo maggiore."],l:"Teatro",lat:44.80,lon:10.32}]
+  cucina:[
+    {s:["Il cuoco","Lo chef","Il pasticcere"],v:["impasta","decora","assaggia"],c:["la torta dolce.","il pane caldo.","la zuppa gustosa."],l:"Cucina",lat:45.46,lon:9.19},
+    {s:["La fornaia","Il pizzaiolo","La nonna"],v:["prepara","sforna","condisce"],c:["il pane fragrante.","la pizza fumante.","la pasta fresca."],l:"Forno",lat:40.85,lon:14.26},
+    {s:["Il cameriere","L'aiuto cuoco","La chef stellata"],v:["porta","presenta","serve"],c:["il piatto del giorno.","il dolce della casa.","l'antipasto colorato."],l:"Ristorante",lat:41.90,lon:12.49}
+  ],
+  basket:[
+    {s:["Il pivot","La guardia","L'ala grande"],v:["stoppa","passa","tira"],c:["sotto canestro.","da tre punti.","con precisione."],l:"Palazzetto",lat:44.49,lon:11.34},
+    {s:["Il coach","Il capitano","La playmaker"],v:["chiama","prepara","guida"],c:["lo schema vincente.","il contropiede.","la difesa a zona."],l:"Palestra",lat:45.48,lon:9.12}
+  ],
+  pesca:[
+    {s:["Il pescatore","L'esperto"],v:["lancia","recupera","attende"],c:["l'amo nel lago.","la lenza lunga.","il pesce grande."],l:"Fiume Po",lat:44.90,lon:12.00},
+    {s:["Il nonno","La guida","Il campione"],v:["insegna","mostra","racconta"],c:["il nodo perfetto.","il lancio lungo.","la tecnica giusta."],l:"Riva del lago",lat:45.66,lon:10.05}
+  ],
+  calcio:[
+    {s:["L'arbitro","Il mediano","Il mister"],v:["fischia","corre","chiama"],c:["il fallo netto.","sulla fascia.","lo schema tattico."],l:"Stadio",lat:45.10,lon:7.64},
+    {s:["La squadra","Il capitano","Il bomber"],v:["prepara","sogna","cerca"],c:["la partita perfetta.","il gol vittoria.","la coppa dorata."],l:"Campo sportivo",lat:45.70,lon:9.68}
+  ],
+  ippica:[
+    {s:["Il fantino","Lo stalliere"],v:["spazzola","guida","monta"],c:["il cavallo nero.","verso la pista.","con molta cura."],l:"Scuderia",lat:43.31,lon:11.33},
+    {s:["L'istruttrice","Il veterinario","La cavallerizza"],v:["controlla","cura","accarezza"],c:["il puledro vivace.","la giumenta calma.","il campione stanco."],l:"Maneggio",lat:45.41,lon:10.98}
+  ],
+  nerd:[
+    {s:["Il programmatore","L'ingegnere"],v:["progetta","prova","aggiorna"],c:["il codice nuovo.","il robot veloce.","il gioco divertente."],l:"Laboratorio",lat:43.72,lon:10.40},
+    {s:["La classe","Il maker","La squadra"],v:["stampa","programma","collauda"],c:["il robot nuovo.","il modello 3D.","il piccolo drone."],l:"Laboratorio",lat:45.40,lon:9.92}
+  ],
+  viaggi:[
+    {s:["Il viaggiatore","La guida"],v:["osserva","spiega","scopre"],c:["il monumento antico.","la storia locale.","una piazza nuova."],l:"Città d'arte",lat:41.90,lon:12.49},
+    {s:["La famiglia","Il gruppo","La classe"],v:["visita","fotografa","esplora"],c:["il borgo antico.","il museo famoso.","il castello sul lago."],l:"Borgo italiano",lat:43.31,lon:11.33}
+  ],
+  volley:[
+    {s:["Il centrale","L'allenatore"],v:["chiama","salta","difende"],c:["il tempo tecnico.","a muro alto.","la palla insidiosa."],l:"Palasport",lat:46.05,lon:11.11},
+    {s:["La capitana","Il libero","La schiacciatrice"],v:["salva","riceve","attacca"],c:["la palla impossibile.","la battuta forte.","il pallonetto astuto."],l:"Palazzetto",lat:45.88,lon:12.30}
+  ],
+  gym:[
+    {s:["L'atleta","La ginnasta","Il campione"],v:["esegue","prova","studia"],c:["la capriola.","il salto teso.","la coreografia."],l:"Palestra",lat:45.54,lon:10.22},
+    {s:["La squadra","L'istruttrice","La campionessa"],v:["ripete","corregge","perfeziona"],c:["la routine di gara.","il volteggio nuovo.","l'uscita dalla trave."],l:"Palestra",lat:45.54,lon:10.22}
+  ],
+  moto:[
+    {s:["Il meccanico","Il pilota"],v:["controlla","cambia","scalda"],c:["la gomma nuova.","la marcia veloce.","il motore potente."],l:"Box",lat:44.64,lon:10.92},
+    {s:["Il team","La squadra corse","Il capo meccanico"],v:["prepara","regola","collauda"],c:["la moto da gara.","le sospensioni.","il motore nuovo."],l:"Officina",lat:44.49,lon:11.34}
+  ],
+  music:[
+    {s:["Il musicista","Il tenore"],v:["legge","canta","prova"],c:["lo spartito difficile.","l'opera lirica.","l'accordo maggiore."],l:"Teatro",lat:44.80,lon:10.32},
+    {s:["Il coro","La banda","L'orchestra"],v:["prova","ripete","esegue"],c:["il brano nuovo.","l'inno della scuola.","la marcia allegra."],l:"Aula di musica",lat:45.40,lon:9.92}
+  ]
 };
 
 /* ============ MODELLO TASTIERA (Magic Keyboard ISO italiana) ============ */
@@ -858,12 +1173,14 @@ const ninjaLevels = [
 ];
 
 /* ============ DATABASE FRASI ============ */
-function generateDB(topic){
-  const pr = premiumPhrases[topic]||premiumPhrases.cucina;
+function generateDB(topic, level){
+  // level 'base' = classi 1-2 primaria (frasi corte); 'std' = tutti gli altri
+  const src = level==='base' ? premiumBase : premiumPhrases;
+  const pr = src[topic]||src.cucina;
   const sg = semantics[topic]||semantics.cucina;
   const db = pr.slice();
-  // PRNG seedato giorno+topic: tutti i partecipanti di oggi hanno lo stesso pool
-  const rand = mulberry32(hashStr(dayStr()+'|'+topic));
+  // PRNG seedato giorno+topic+livello: stesso pool per chi è allo stesso livello
+  const rand = mulberry32(hashStr(dayStr()+'|'+topic+'|'+(level||'std')));
   for(let i=db.length;i<200;i++){
     const g = sg[Math.floor(rand()*sg.length)];
     const s = g.s[Math.floor(rand()*g.s.length)];
@@ -905,7 +1222,8 @@ function avviaSuite(){
 
   st.caps = st.cls.indexOf('P')>=0 && (st.cls.charAt(0)==='1' || st.cls.charAt(0)==='2');
   st.isSec = st.cls.indexOf('S')>=0;
-  st.db = generateDB(st.topic);
+  st.db = generateDB(st.topic, st.caps?'base':'std');
+  st.nPremium = ((st.caps?premiumBase:premiumPhrases)[st.topic]||[]).length;
   st.idx=0; st.score=0; st.done=0;
 
   const conf = topicsConfig[st.topic];
@@ -941,7 +1259,7 @@ function esciLogin(){ location.reload(); }
 function caricaEsercizio(){
   const r = st.db[st.idx % st.db.length];
   let frase = r.t;
-  if(st.isSec){ if(st.idx>=10) frase = frase.replace(/\.$/,", perché è importante."); }
+  if(st.isSec){ if(st.idx>=st.nPremium) frase = frase.replace(/\.$/,", perché è importante."); }
   else if(st.caps){ frase = frase.toUpperCase(); }
 
   st.fullText = frase;
@@ -951,6 +1269,16 @@ function caricaEsercizio(){
   document.getElementById('dishName').innerHTML =
     svg(conf.icon,'ic')+'<span>'+esc(r.n)+'</span>'+
     '<span style="color:var(--faint)">·</span>'+svg('pin','ic')+'<span>'+esc(r.l)+'</span>';
+
+  // Glossario: visibile solo se la frase ha un termine tecnico da spiegare
+  const glossary = document.getElementById('glossary');
+  if(r.g){
+    const gtxt = st.caps ? r.g.toUpperCase() : r.g;
+    glossary.innerHTML = svg('book')+'<span><span class="glb">'+(st.caps?'GLOSSARIO':'Glossario')+'</span>'+esc(gtxt)+'</span>';
+    glossary.classList.remove('hidden');
+  } else {
+    glossary.classList.add('hidden');
+  }
 
   aggiornaDisplay();
   aggiornaVisivo();
